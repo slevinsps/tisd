@@ -1,16 +1,22 @@
-def ReadMatrix(a, n):
-    for i in range(n):
-        try:
+def ReadMatrix(n):
+    try:
+        if n > 100:
+            raise Exception("Превышена размерность матрицы")
+        elif n < 1:
+            raise Exception("Некорректный размер матрицы")
+        print("Введите матрицу:")
+        a = [[]]*n
+        for i in range(n):
             s = input()
             x = s.split()
+            if len(x) != n:
+                raise Exception("Матрица введена некорректно")
             for j in range(len(x)):
                 x[j] = int(x[j])
-        except (TypeError, ValueError):
-            return -1
-        if len(x) != n:
-            return -1
-        a[i] = x
-    return 0
+            a[i] = x
+    except (TypeError, ValueError):
+            return -1,a
+    return 0,a
 
 def OpredPoboch(a,n):
     poboch = [0] * (2*n-1) 
@@ -95,54 +101,48 @@ def form_diag(arr,ind,n):
             ans[k] = arr[ind][i]
             k += 1    
     return ans
-
-
-def main():
-    try:
-        n = int(input("Введите размер матрицы: "))
-    except (TypeError, ValueError):
-        print("Некорректный размер матрицы")
-        return -2
-    
-    if n > 100:
-        print("Превышена размерность матрицы")
-        return -1
-    
-    elif n < 1:
-        print("Некорректный размер матрицы")
-        return -2
-    
-    a = [[]]*n
-    print("Введите матрицу:")
-    k = ReadMatrix(a,n)
-    if k == -1:
-        print("Матрица введена некорректно")
-        return -3
-
-
-    poboch = OpredPoboch(a,n)
-    pr = ProizvOtr(poboch,n)
-    mini = Min(pr,n)
-    if mini < 0:
+def print_poboch_giagonal(min_index,poboch_diagonali,n):
+    if min_index < 0:
         print("Невозможно найти диагональ, параллельную побочной имеющую минимальное\
 произведение отрицательных элементов, так как их нет в матрице")
     else:
-        poboch_ans = form_diag(poboch,mini,n)
+        poboch_ans = form_diag(poboch_diagonali,min_index,n)
         for i in range(len(poboch_ans)):
             print(poboch_ans[i],end=' ')    
         print(" - диагональ, параллельная побочной имеющая минимальное произведение отрицательных элементов")
-
-    glav = OpredGlav(a,n)
-    summa = SumPoloj(glav,n)
-    maxi = Max(summa,n)
-    if maxi < 0:
+        
+def print_glav_giagonal(max_index,glav_diagonali,n):
+    if max_index < 0:
         print("Невозможно найти диагональ, параллельную главной имеющую максимальную\
 сумму положительных элементов, так как их нет в матрице")
     else:
-        glav_ans = form_diag(glav,maxi,n)
+        glav_ans = form_diag(glav_diagonali,max_index,n)
         for i in range(len(glav_ans)):
             print(glav_ans[i],end=' ')
         print(" - диагональ, параллельная главной имеющая максимальную сумму положительных элементов ")
-    return 0
+    
+def main():
+    try:
+
+        n = int(input("Введите размер матрицы: "))  
+        
+        k,a = ReadMatrix(n)
+        if k == -1:
+           raise Exception("Матрица введена некорректно")
+
+        poboch_diagonali = OpredPoboch(a,n)
+        proizvedenie_diag = ProizvOtr(poboch_diagonali,n)
+        min_index = Min(proizvedenie_diag,n)
+        print_poboch_giagonal(min_index,poboch_diagonali,n)
+
+        glav_diagonali = OpredGlav(a,n)
+        summa_diag = SumPoloj(glav_diagonali,n)
+        max_index = Max(summa_diag,n)
+        print_glav_giagonal(max_index,glav_diagonali,n)
+        
+    except (TypeError, ValueError):
+        print("Некорректный размер матрицы")
+    except Exception as e:
+        print(e)
 
 main()
