@@ -194,4 +194,4 @@ def main():
     except (TypeError, ValueError):
         print("Некорректный размер матрицы")
 
-main()
+#main()
