@@ -5,6 +5,11 @@
 # имеющую максимальную сумму положительных элементов, и диагональ матрицы, параллельную
 # побочной, имеющую минимальное произведение отрицательных
 
+DIMENSION_EXCEEDED = -1
+INVALID_SIZE = -2
+ERR_NUMBER_IN_LINE = -3
+INVALID_ELEMENTS = -4
+
 ## Считывает размер матрицы и саму матрицу
 #
 # @return a - матрица размера n*n
@@ -233,10 +238,6 @@ def error_print(k):
 #
 # @throw INVALID_SIZE Некорректный размера матрицы
 def main():
-    DIMENSION_EXCEEDED = -1
-    INVALID_SIZE = -2
-    ERR_NUMBER_IN_LINE = -3
-    INVALID_ELEMENTS = -4
     try:
         error,a,n = ReadMatrix()
         if error != 0:
