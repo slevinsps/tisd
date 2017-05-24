@@ -1,0 +1,306 @@
+\hypertarget{namespacezad1__7}{}\section{zad1\+\_\+7 Namespace Reference}
+\label{namespacezad1__7}\index{zad1\+\_\+7@{zad1\+\_\+7}}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{namespacezad1__7_a79b87b68ec1cac6b4fb9fc6b895ca7d9}{Read\+Matrix} ()
+\begin{DoxyCompactList}\small\item\em Считывает размер матрицы и саму матрицу \end{DoxyCompactList}\item 
+def \hyperlink{namespacezad1__7_abc57efa05ad7ba5180f4801687a61d1a}{Opred\+Poboch} (a, n)
+\begin{DoxyCompactList}\small\item\em Выделяет из массива диагонали параллельные побочной \end{DoxyCompactList}\item 
+def \hyperlink{namespacezad1__7_afbae12f0e97d9c081b4566028822d408}{Opred\+Glav} (a, n)
+\begin{DoxyCompactList}\small\item\em Выделяет из массива диагонали параллельные главной \end{DoxyCompactList}\item 
+def \hyperlink{namespacezad1__7_af5f06dab7e06a7721c31d4ca86a758a5}{Proizv\+Otr} (poboch, n)
+\begin{DoxyCompactList}\small\item\em Перемножает отрицательные элементы массива \end{DoxyCompactList}\item 
+def \hyperlink{namespacezad1__7_a314799e2c040c2260804e900dddc6588}{Sum\+Poloj} (glav, n)
+\begin{DoxyCompactList}\small\item\em Суммирует положительные элементы массива \end{DoxyCompactList}\item 
+def \hyperlink{namespacezad1__7_a4e23c099132e7637560c715410b80cb5}{Min} (pr, n)
+\begin{DoxyCompactList}\small\item\em Находит идекс минимального элемента \end{DoxyCompactList}\item 
+def \hyperlink{namespacezad1__7_a6a71e5d3500d9d48fcb274d95e6bc7ef}{Max} (summa, n)
+\begin{DoxyCompactList}\small\item\em Находит идекс максимального элемента \end{DoxyCompactList}\item 
+def \hyperlink{namespacezad1__7_acdfea6715d348498eddf567680af04e7}{form\+\_\+diag} (arr, ind, n)
+\begin{DoxyCompactList}\small\item\em Формирует диагональ матрицы, убирая лишние элементы \end{DoxyCompactList}\item 
+def \hyperlink{namespacezad1__7_a45ca6620ee12215963586dbf0349d0f9}{print\+\_\+poboch\+\_\+giagonal} (min\+\_\+index, poboch\+\_\+diagonali, n)
+\begin{DoxyCompactList}\small\item\em Печатает диагональ параллельную побочной \end{DoxyCompactList}\item 
+def \hyperlink{namespacezad1__7_a0e157ac6a594195e0489db284ee6099b}{print\+\_\+glav\+\_\+giagonal} (max\+\_\+index, glav\+\_\+diagonali, n)
+\begin{DoxyCompactList}\small\item\em Печатает диагональ параллельную главной \end{DoxyCompactList}\item 
+def \hyperlink{namespacezad1__7_ac86b62e3975a9149e265609a78faa797}{error\+\_\+print} (k)
+\begin{DoxyCompactList}\small\item\em Печатает ошибку, возникшую в программе \end{DoxyCompactList}\item 
+def \hyperlink{namespacezad1__7_a8ab0946ca9b9e1167ddf26a5866ba6db}{main} ()
+\begin{DoxyCompactList}\small\item\em Точка входа в программу \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{namespacezad1__7_a4348fe99a091a729e664ae20ae198e5c}{D\+I\+M\+E\+N\+S\+I\+O\+N\+\_\+\+E\+X\+C\+E\+E\+D\+ED} = -\/1
+\item 
+int \hyperlink{namespacezad1__7_a902cdfbaac2f6c2d35a80024ea27e9ff}{I\+N\+V\+A\+L\+I\+D\+\_\+\+S\+I\+ZE} = -\/2
+\item 
+int \hyperlink{namespacezad1__7_a1e04c9c787059826e42cdfbd703961e8}{E\+R\+R\+\_\+\+N\+U\+M\+B\+E\+R\+\_\+\+I\+N\+\_\+\+L\+I\+NE} = -\/3
+\item 
+int \hyperlink{namespacezad1__7_a32c3be182bfdd83db4351c74e22aa7cc}{I\+N\+V\+A\+L\+I\+D\+\_\+\+E\+L\+E\+M\+E\+N\+TS} = -\/4
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{namespacezad1__7_ac86b62e3975a9149e265609a78faa797}\label{namespacezad1__7_ac86b62e3975a9149e265609a78faa797}} 
+\index{zad1\+\_\+7@{zad1\+\_\+7}!error\+\_\+print@{error\+\_\+print}}
+\index{error\+\_\+print@{error\+\_\+print}!zad1\+\_\+7@{zad1\+\_\+7}}
+\subsubsection{\texorpdfstring{error\+\_\+print()}{error\_print()}}
+{\footnotesize\ttfamily def zad1\+\_\+7.\+error\+\_\+print (\begin{DoxyParamCaption}\item[{}]{k }\end{DoxyParamCaption})}
+
+
+
+Печатает ошибку, возникшую в программе 
+
+
+\begin{DoxyParams}{Parameters}
+{\em k} & -\/ номер ошибки \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{namespacezad1__7_acdfea6715d348498eddf567680af04e7}\label{namespacezad1__7_acdfea6715d348498eddf567680af04e7}} 
+\index{zad1\+\_\+7@{zad1\+\_\+7}!form\+\_\+diag@{form\+\_\+diag}}
+\index{form\+\_\+diag@{form\+\_\+diag}!zad1\+\_\+7@{zad1\+\_\+7}}
+\subsubsection{\texorpdfstring{form\+\_\+diag()}{form\_diag()}}
+{\footnotesize\ttfamily def zad1\+\_\+7.\+form\+\_\+diag (\begin{DoxyParamCaption}\item[{}]{arr,  }\item[{}]{ind,  }\item[{}]{n }\end{DoxyParamCaption})}
+
+
+
+Формирует диагональ матрицы, убирая лишние элементы 
+
+
+\begin{DoxyParams}{Parameters}
+{\em arr} & -\/ двумерный массив диагоналей размера 2$\ast$n-\/1 на n \\
+\hline
+{\em ind} & -\/ индекс диагонали \\
+\hline
+{\em n} & -\/ размер матрицы \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+ans -\/ диагональ матрицы 
+\end{DoxyReturn}
+\mbox{\Hypertarget{namespacezad1__7_a8ab0946ca9b9e1167ddf26a5866ba6db}\label{namespacezad1__7_a8ab0946ca9b9e1167ddf26a5866ba6db}} 
+\index{zad1\+\_\+7@{zad1\+\_\+7}!main@{main}}
+\index{main@{main}!zad1\+\_\+7@{zad1\+\_\+7}}
+\subsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily def zad1\+\_\+7.\+main (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Точка входа в программу 
+
+
+\begin{DoxyExceptions}{Exceptions}
+{\em I\+N\+V\+A\+L\+I\+D\+\_\+\+S\+I\+ZE} & Некорректный размера матрицы \\
+\hline
+\end{DoxyExceptions}
+\mbox{\Hypertarget{namespacezad1__7_a6a71e5d3500d9d48fcb274d95e6bc7ef}\label{namespacezad1__7_a6a71e5d3500d9d48fcb274d95e6bc7ef}} 
+\index{zad1\+\_\+7@{zad1\+\_\+7}!Max@{Max}}
+\index{Max@{Max}!zad1\+\_\+7@{zad1\+\_\+7}}
+\subsubsection{\texorpdfstring{Max()}{Max()}}
+{\footnotesize\ttfamily def zad1\+\_\+7.\+Max (\begin{DoxyParamCaption}\item[{}]{summa,  }\item[{}]{n }\end{DoxyParamCaption})}
+
+
+
+Находит идекс максимального элемента 
+
+
+\begin{DoxyParams}{Parameters}
+{\em summa} & -\/ массив размера 2$\ast$n-\/1 \\
+\hline
+{\em n} & -\/ размер матрицы \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+maxi -\/ индекс максимального элемента массива 
+\end{DoxyReturn}
+\mbox{\Hypertarget{namespacezad1__7_a4e23c099132e7637560c715410b80cb5}\label{namespacezad1__7_a4e23c099132e7637560c715410b80cb5}} 
+\index{zad1\+\_\+7@{zad1\+\_\+7}!Min@{Min}}
+\index{Min@{Min}!zad1\+\_\+7@{zad1\+\_\+7}}
+\subsubsection{\texorpdfstring{Min()}{Min()}}
+{\footnotesize\ttfamily def zad1\+\_\+7.\+Min (\begin{DoxyParamCaption}\item[{}]{pr,  }\item[{}]{n }\end{DoxyParamCaption})}
+
+
+
+Находит идекс минимального элемента 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pr} & -\/ массив размера 2$\ast$n-\/1 \\
+\hline
+{\em n} & -\/ размер матрицы \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+mini -\/ индекс минимального элемента массива 
+\end{DoxyReturn}
+\mbox{\Hypertarget{namespacezad1__7_afbae12f0e97d9c081b4566028822d408}\label{namespacezad1__7_afbae12f0e97d9c081b4566028822d408}} 
+\index{zad1\+\_\+7@{zad1\+\_\+7}!Opred\+Glav@{Opred\+Glav}}
+\index{Opred\+Glav@{Opred\+Glav}!zad1\+\_\+7@{zad1\+\_\+7}}
+\subsubsection{\texorpdfstring{Opred\+Glav()}{OpredGlav()}}
+{\footnotesize\ttfamily def zad1\+\_\+7.\+Opred\+Glav (\begin{DoxyParamCaption}\item[{}]{a,  }\item[{}]{n }\end{DoxyParamCaption})}
+
+
+
+Выделяет из массива диагонали параллельные главной 
+
+
+\begin{DoxyParams}{Parameters}
+{\em a} & -\/ матрица размера n$\ast$n \\
+\hline
+{\em n} & -\/ размер матрицы \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+glav -\/ двумерный массив диагоналей, параллельных главной, размера 2$\ast$n-\/1 на n 
+\end{DoxyReturn}
+\mbox{\Hypertarget{namespacezad1__7_abc57efa05ad7ba5180f4801687a61d1a}\label{namespacezad1__7_abc57efa05ad7ba5180f4801687a61d1a}} 
+\index{zad1\+\_\+7@{zad1\+\_\+7}!Opred\+Poboch@{Opred\+Poboch}}
+\index{Opred\+Poboch@{Opred\+Poboch}!zad1\+\_\+7@{zad1\+\_\+7}}
+\subsubsection{\texorpdfstring{Opred\+Poboch()}{OpredPoboch()}}
+{\footnotesize\ttfamily def zad1\+\_\+7.\+Opred\+Poboch (\begin{DoxyParamCaption}\item[{}]{a,  }\item[{}]{n }\end{DoxyParamCaption})}
+
+
+
+Выделяет из массива диагонали параллельные побочной 
+
+
+\begin{DoxyParams}{Parameters}
+{\em a} & -\/ матрица размера n$\ast$n \\
+\hline
+{\em n} & -\/ размер матрицы \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+poboch -\/ двумерный массив диагоналей, параллельных побочной, размера 2$\ast$n-\/1 на n 
+\end{DoxyReturn}
+\mbox{\Hypertarget{namespacezad1__7_a0e157ac6a594195e0489db284ee6099b}\label{namespacezad1__7_a0e157ac6a594195e0489db284ee6099b}} 
+\index{zad1\+\_\+7@{zad1\+\_\+7}!print\+\_\+glav\+\_\+giagonal@{print\+\_\+glav\+\_\+giagonal}}
+\index{print\+\_\+glav\+\_\+giagonal@{print\+\_\+glav\+\_\+giagonal}!zad1\+\_\+7@{zad1\+\_\+7}}
+\subsubsection{\texorpdfstring{print\+\_\+glav\+\_\+giagonal()}{print\_glav\_giagonal()}}
+{\footnotesize\ttfamily def zad1\+\_\+7.\+print\+\_\+glav\+\_\+giagonal (\begin{DoxyParamCaption}\item[{}]{max\+\_\+index,  }\item[{}]{glav\+\_\+diagonali,  }\item[{}]{n }\end{DoxyParamCaption})}
+
+
+
+Печатает диагональ параллельную главной 
+
+
+\begin{DoxyParams}{Parameters}
+{\em max\+\_\+index} & -\/ индекс диагонали \\
+\hline
+{\em glav\+\_\+diagonali} & -\/ двумерный массив диагоналей размера 2$\ast$n-\/1 на n \\
+\hline
+{\em n} & -\/ размер матрицы \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{namespacezad1__7_a45ca6620ee12215963586dbf0349d0f9}\label{namespacezad1__7_a45ca6620ee12215963586dbf0349d0f9}} 
+\index{zad1\+\_\+7@{zad1\+\_\+7}!print\+\_\+poboch\+\_\+giagonal@{print\+\_\+poboch\+\_\+giagonal}}
+\index{print\+\_\+poboch\+\_\+giagonal@{print\+\_\+poboch\+\_\+giagonal}!zad1\+\_\+7@{zad1\+\_\+7}}
+\subsubsection{\texorpdfstring{print\+\_\+poboch\+\_\+giagonal()}{print\_poboch\_giagonal()}}
+{\footnotesize\ttfamily def zad1\+\_\+7.\+print\+\_\+poboch\+\_\+giagonal (\begin{DoxyParamCaption}\item[{}]{min\+\_\+index,  }\item[{}]{poboch\+\_\+diagonali,  }\item[{}]{n }\end{DoxyParamCaption})}
+
+
+
+Печатает диагональ параллельную побочной 
+
+
+\begin{DoxyParams}{Parameters}
+{\em min\+\_\+index} & -\/ индекс диагонали \\
+\hline
+{\em poboch\+\_\+diagonali} & -\/ двумерный массив диагоналей размера 2$\ast$n-\/1 на n \\
+\hline
+{\em n} & -\/ размер матрицы \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{namespacezad1__7_af5f06dab7e06a7721c31d4ca86a758a5}\label{namespacezad1__7_af5f06dab7e06a7721c31d4ca86a758a5}} 
+\index{zad1\+\_\+7@{zad1\+\_\+7}!Proizv\+Otr@{Proizv\+Otr}}
+\index{Proizv\+Otr@{Proizv\+Otr}!zad1\+\_\+7@{zad1\+\_\+7}}
+\subsubsection{\texorpdfstring{Proizv\+Otr()}{ProizvOtr()}}
+{\footnotesize\ttfamily def zad1\+\_\+7.\+Proizv\+Otr (\begin{DoxyParamCaption}\item[{}]{poboch,  }\item[{}]{n }\end{DoxyParamCaption})}
+
+
+
+Перемножает отрицательные элементы массива 
+
+
+\begin{DoxyParams}{Parameters}
+{\em poboch} & -\/ двумерный массив размера 2$\ast$n-\/1 на n \\
+\hline
+{\em n} & -\/ размер матрицы \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+pr -\/ массив размера 2$\ast$n-\/1 произведений отрицательных элементов 
+\end{DoxyReturn}
+\mbox{\Hypertarget{namespacezad1__7_a79b87b68ec1cac6b4fb9fc6b895ca7d9}\label{namespacezad1__7_a79b87b68ec1cac6b4fb9fc6b895ca7d9}} 
+\index{zad1\+\_\+7@{zad1\+\_\+7}!Read\+Matrix@{Read\+Matrix}}
+\index{Read\+Matrix@{Read\+Matrix}!zad1\+\_\+7@{zad1\+\_\+7}}
+\subsubsection{\texorpdfstring{Read\+Matrix()}{ReadMatrix()}}
+{\footnotesize\ttfamily def zad1\+\_\+7.\+Read\+Matrix (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Считывает размер матрицы и саму матрицу 
+
+\begin{DoxyReturn}{Returns}
+a -\/ матрица размера n$\ast$n 
+
+n -\/ размер матрицы 
+\end{DoxyReturn}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em D\+I\+M\+E\+N\+S\+I\+O\+N\+\_\+\+E\+X\+C\+E\+E\+D\+ED} & Превышена размерность матрицы \\
+\hline
+{\em I\+N\+V\+A\+L\+I\+D\+\_\+\+S\+I\+ZE} & Некорректный размер матрицы \\
+\hline
+{\em E\+R\+R\+\_\+\+N\+U\+M\+B\+E\+R\+\_\+\+I\+N\+\_\+\+L\+I\+NE} & Количество элементов матрицы в строке не соответствует размеру матрицы \\
+\hline
+{\em I\+N\+V\+A\+L\+I\+D\+\_\+\+E\+L\+E\+M\+E\+N\+TS} & Элементы матрицы введены некорректно \\
+\hline
+\end{DoxyExceptions}
+\mbox{\Hypertarget{namespacezad1__7_a314799e2c040c2260804e900dddc6588}\label{namespacezad1__7_a314799e2c040c2260804e900dddc6588}} 
+\index{zad1\+\_\+7@{zad1\+\_\+7}!Sum\+Poloj@{Sum\+Poloj}}
+\index{Sum\+Poloj@{Sum\+Poloj}!zad1\+\_\+7@{zad1\+\_\+7}}
+\subsubsection{\texorpdfstring{Sum\+Poloj()}{SumPoloj()}}
+{\footnotesize\ttfamily def zad1\+\_\+7.\+Sum\+Poloj (\begin{DoxyParamCaption}\item[{}]{glav,  }\item[{}]{n }\end{DoxyParamCaption})}
+
+
+
+Суммирует положительные элементы массива 
+
+
+\begin{DoxyParams}{Parameters}
+{\em glav} & -\/ двумерный массив размера 2$\ast$n-\/1 на n \\
+\hline
+{\em n} & -\/ размер матрицы \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+summa -\/ массив размера 2$\ast$n-\/1 сумм положительных элементов 
+\end{DoxyReturn}
+
+
+\subsection{Variable Documentation}
+\mbox{\Hypertarget{namespacezad1__7_a4348fe99a091a729e664ae20ae198e5c}\label{namespacezad1__7_a4348fe99a091a729e664ae20ae198e5c}} 
+\index{zad1\+\_\+7@{zad1\+\_\+7}!D\+I\+M\+E\+N\+S\+I\+O\+N\+\_\+\+E\+X\+C\+E\+E\+D\+ED@{D\+I\+M\+E\+N\+S\+I\+O\+N\+\_\+\+E\+X\+C\+E\+E\+D\+ED}}
+\index{D\+I\+M\+E\+N\+S\+I\+O\+N\+\_\+\+E\+X\+C\+E\+E\+D\+ED@{D\+I\+M\+E\+N\+S\+I\+O\+N\+\_\+\+E\+X\+C\+E\+E\+D\+ED}!zad1\+\_\+7@{zad1\+\_\+7}}
+\subsubsection{\texorpdfstring{D\+I\+M\+E\+N\+S\+I\+O\+N\+\_\+\+E\+X\+C\+E\+E\+D\+ED}{DIMENSION\_EXCEEDED}}
+{\footnotesize\ttfamily int zad1\+\_\+7.\+D\+I\+M\+E\+N\+S\+I\+O\+N\+\_\+\+E\+X\+C\+E\+E\+D\+ED = -\/1}
+
+\mbox{\Hypertarget{namespacezad1__7_a1e04c9c787059826e42cdfbd703961e8}\label{namespacezad1__7_a1e04c9c787059826e42cdfbd703961e8}} 
+\index{zad1\+\_\+7@{zad1\+\_\+7}!E\+R\+R\+\_\+\+N\+U\+M\+B\+E\+R\+\_\+\+I\+N\+\_\+\+L\+I\+NE@{E\+R\+R\+\_\+\+N\+U\+M\+B\+E\+R\+\_\+\+I\+N\+\_\+\+L\+I\+NE}}
+\index{E\+R\+R\+\_\+\+N\+U\+M\+B\+E\+R\+\_\+\+I\+N\+\_\+\+L\+I\+NE@{E\+R\+R\+\_\+\+N\+U\+M\+B\+E\+R\+\_\+\+I\+N\+\_\+\+L\+I\+NE}!zad1\+\_\+7@{zad1\+\_\+7}}
+\subsubsection{\texorpdfstring{E\+R\+R\+\_\+\+N\+U\+M\+B\+E\+R\+\_\+\+I\+N\+\_\+\+L\+I\+NE}{ERR\_NUMBER\_IN\_LINE}}
+{\footnotesize\ttfamily int zad1\+\_\+7.\+E\+R\+R\+\_\+\+N\+U\+M\+B\+E\+R\+\_\+\+I\+N\+\_\+\+L\+I\+NE = -\/3}
+
+\mbox{\Hypertarget{namespacezad1__7_a32c3be182bfdd83db4351c74e22aa7cc}\label{namespacezad1__7_a32c3be182bfdd83db4351c74e22aa7cc}} 
+\index{zad1\+\_\+7@{zad1\+\_\+7}!I\+N\+V\+A\+L\+I\+D\+\_\+\+E\+L\+E\+M\+E\+N\+TS@{I\+N\+V\+A\+L\+I\+D\+\_\+\+E\+L\+E\+M\+E\+N\+TS}}
+\index{I\+N\+V\+A\+L\+I\+D\+\_\+\+E\+L\+E\+M\+E\+N\+TS@{I\+N\+V\+A\+L\+I\+D\+\_\+\+E\+L\+E\+M\+E\+N\+TS}!zad1\+\_\+7@{zad1\+\_\+7}}
+\subsubsection{\texorpdfstring{I\+N\+V\+A\+L\+I\+D\+\_\+\+E\+L\+E\+M\+E\+N\+TS}{INVALID\_ELEMENTS}}
+{\footnotesize\ttfamily int zad1\+\_\+7.\+I\+N\+V\+A\+L\+I\+D\+\_\+\+E\+L\+E\+M\+E\+N\+TS = -\/4}
+
+\mbox{\Hypertarget{namespacezad1__7_a902cdfbaac2f6c2d35a80024ea27e9ff}\label{namespacezad1__7_a902cdfbaac2f6c2d35a80024ea27e9ff}} 
+\index{zad1\+\_\+7@{zad1\+\_\+7}!I\+N\+V\+A\+L\+I\+D\+\_\+\+S\+I\+ZE@{I\+N\+V\+A\+L\+I\+D\+\_\+\+S\+I\+ZE}}
+\index{I\+N\+V\+A\+L\+I\+D\+\_\+\+S\+I\+ZE@{I\+N\+V\+A\+L\+I\+D\+\_\+\+S\+I\+ZE}!zad1\+\_\+7@{zad1\+\_\+7}}
+\subsubsection{\texorpdfstring{I\+N\+V\+A\+L\+I\+D\+\_\+\+S\+I\+ZE}{INVALID\_SIZE}}
+{\footnotesize\ttfamily int zad1\+\_\+7.\+I\+N\+V\+A\+L\+I\+D\+\_\+\+S\+I\+ZE = -\/2}
+
