@@ -1,4 +1,4 @@
-import zad1_7 as zad
+﻿import main as zad
 
 def TestsOpredPoboch():
     k = 0;
