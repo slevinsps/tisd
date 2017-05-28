@@ -14,7 +14,11 @@ def TestsOpredPoboch():
         print("Test %d in TestsOpredPoboch passed" % k)
     else:
         print("Test %d in TestsOpredPoboch failed" % k)
-        
+        print("Expected: ")
+        print(expected)
+        print("Actual: ")
+        print(actual)
+                
     # 2 тест - тест на граничное значение размера матрицы
     a = [[1]]
     n = 1
@@ -25,6 +29,10 @@ def TestsOpredPoboch():
         print("Test %d in TestsOpredPoboch passed" % k)
     else:
         print("Test %d in TestsOpredPoboch failed" % k)
+        print("Expected: ")
+        print(expected)
+        print("Actual: ")
+        print(actual)
     print()
 
 def TestsOpredGlav():
@@ -41,6 +49,10 @@ def TestsOpredGlav():
         print("Test %d in TestsOpredGlav passed" % k)
     else:
         print("Test %d in TestsOpredGlav failed" % k)
+        print("Expected: ")
+        print(expected)
+        print("Actual: ")
+        print(actual)
         
     # 2 тест - тест на граничное значение размера матрицы
     a = [[-4]]
@@ -52,6 +64,10 @@ def TestsOpredGlav():
         print("Test %d in TestsOpredGlav passed" % k)
     else:
         print("Test %d in TestsOpredGlav failed" % k)
+        print("Expected: ")
+        print(expected)
+        print("Actual: ")
+        print(actual)
     print()
     
 def TestsProizvOtr():
@@ -63,13 +79,17 @@ def TestsProizvOtr():
          [0,-2,-2],
          [0,0,0]]
     n = 3
-    expexted = [0,-1,0,4,0]
+    expected = [0,-1,0,4,0]
     actual = zad.ProizvOtr(a,n)
     k+=1
-    if  actual == expexted:
+    if  actual == expected:
         print("Test %d in TestsProizvOtr passed" % k)
     else:
         print("Test %d in TestsProizvOtr failed" % k)
+        print("Expected: ")
+        print(expected)
+        print("Actual: ")
+        print(actual)
             
 def TestsSumPoloj():
     k = 0;
@@ -87,8 +107,12 @@ def TestsSumPoloj():
         print("Test %d in TestsSumPoloj passed" % k)
     else:
         print("Test %d in TestsSumPoloj failed" % k)
+        print("Expected: ")
+        print(expected)
+        print("Actual: ")
+        print(actual)
     print()
-	
+    
 def TestsMin():
     k = 0;
     # 1 тест - одно минимальное значение
@@ -101,6 +125,10 @@ def TestsMin():
         print("Test %d in TestsMin passed" % k)
     else:
         print("Test %d in TestsMin failed" % k)
+        print("Expected: ")
+        print(expected)
+        print("Actual: ")
+        print(actual)
 
     # 2 тест - одинаковые минимальные значения
     a = [8,0,6,6,0]
@@ -112,6 +140,10 @@ def TestsMin():
         print("Test %d in TestsMin passed" % k)
     else:
         print("Test %d in TestsMin failed" % k)
+        print("Expected: ")
+        print(expected)
+        print("Actual: ")
+        print(actual)
 
     # 3 тест - все нули обозначающие, что в диагонали нет отрицательных элементов
     a = [0,0,0,0,0]
@@ -122,7 +154,11 @@ def TestsMin():
     if actual == expected:
         print("Test %d in TestsMin passed" % k)
     else:
-        print("Test %d in TestsMin failed" % k)    
+        print("Test %d in TestsMin failed" % k)
+        print("Expected: ")
+        print(expected)
+        print("Actual: ")
+        print(actual)        
     print()
 
 def TestsMax():
@@ -137,6 +173,10 @@ def TestsMax():
         print("Test %d in TestsMax passed" % k)
     else:
         print("Test %d in TestsMax failed" % k)
+        print("Expected: ")
+        print(expected)
+        print("Actual: ")
+        print(actual)
 
     # 2 тест - одинаковые максимальные значения
     a = [2,-1,6,6,-1]
@@ -148,6 +188,10 @@ def TestsMax():
         print("Test %d in TestsMax passed" % k)
     else:
         print("Test %d in TestsMax failed" % k)
+        print("Expected: ")
+        print(expected)
+        print("Actual: ")
+        print(actual)
         
     # 3 тест - все -1,обозначающие, что в диагонали нет положительных элементов
     a = [-1,-1,-1,-1,-1]
@@ -159,6 +203,10 @@ def TestsMax():
         print("Test %d in TestsMax passed" % k)
     else:
         print("Test %d in TestsMax failed" % k)
+        print("Expected: ")
+        print(expected)
+        print("Actual: ")
+        print(actual)
         
     print()
     
@@ -169,62 +217,80 @@ def TestsForm_diag():
     ind = 0
     n = 3
     actual = zad.form_diag(arr,ind,n)
-    excepted = [2]
+    expected = [2]
     k+=1
-    if actual == excepted:
+    if actual == expected:
         print("Test %d in TestsForm_diag passed" % k)
     else:
         print("Test %d in TestsForm_diag failed" % k)
+        print("Expected: ")
+        print(expected)
+        print("Actual: ")
+        print(actual)
         
     # 2 тест
     arr = [-4, 3, 0]
     ind = 1
     n = 3
     actual = zad.form_diag(arr,ind,n)
-    excepted = [-4, 3]
+    expected = [-4, 3]
     k+=1
-    if actual == excepted:
+    if actual == expected:
         print("Test %d in TestsForm_diag passed" % k)
     else:
         print("Test %d in TestsForm_diag failed" % k)
+        print("Expected: ")
+        print(expected)
+        print("Actual: ")
+        print(actual)
 
     # 3 тест
     arr = [3, 8, -1]
     ind = 2
     n = 3
     actual = zad.form_diag(arr,ind,n)
-    excepted = [3, 8, -1]
+    expected = [3, 8, -1]
     k+=1
-    if actual == excepted:
+    if actual == expected:
         print("Test %d in TestsForm_diag passed" % k)
     else:
         print("Test %d in TestsForm_diag failed" % k)
-
+        print("Expected: ")
+        print(expected)
+        print("Actual: ")
+        print(actual)
     
     # 4 тест
     arr = [0, 4, 2]
     ind = 3
     n = 3
     actual = zad.form_diag(arr,ind,n)
-    excepted = [4, 2]
+    expected = [4, 2]
     k+=1
-    if actual == excepted:
+    if actual == expected:
         print("Test %d in TestsForm_diag passed" % k)
     else:
         print("Test %d in TestsForm_diag failed" % k)
+        print("Expected: ")
+        print(expected)
+        print("Actual: ")
+        print(actual)
         
-
     # 5 тест
     arr = [0, 0, 6]
     ind = 4
     n = 3
     actual = zad.form_diag(arr,ind,n)
-    excepted = [6]
+    expected = [6]
     k+=1
-    if actual == excepted:
+    if actual == expected:
         print("Test %d in TestsForm_diag passed" % k)
     else:
         print("Test %d in TestsForm_diag failed" % k)
+        print("Expected: ")
+        print(expected)
+        print("Actual: ")
+        print(actual)
     
 def main():    
     TestsOpredPoboch()    
