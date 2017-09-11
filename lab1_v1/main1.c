@@ -304,89 +304,102 @@ int main()
     fgets(s2, MAX_STRING_LENGTH2, stdin);
     s2[strlen(s2)-1] = '\0';
     len2 = strlen(s2);
-    
-    if (s2[0] == '-')
-        zn2 = 0;
-    
-    if (s1[0] == '-')
-        zn1 = 0;
-    
-    if ((s2[0] == '+') || (s2[0] == '-'))
+    if (strlen(s1) == 0)
     {
-        for (int i=0;i<len2-1;i++)
-        {
-            s2[i] = s2[i+1];
-        }
-        len2 -= 1;
+        printf("First number incorrect\n");
+        err = NUM1_INCORRECT;
     }
-	if (s2[0] == '0')
-	{
-		printf("Division by 0\n");
-		err = DIVISION_BY_0;
-	}
+    else if (strlen(s2) == 0)
+    {
+        printf("Second number incorrect\n");
+        err = NUM2_INCORRECT;
+    }
     else
-	{
-		err = read_first_number(&len1,s1,s1_new,&por_new);
-		if (err == NUM1_INCORRECT)
-		{
-			printf("First number incorrect\n");
-		}
-		else
-		{
-			compare_strings(&len1,&len2,&por_new,s1_new,s2);
-	
-			if (len1>30)
-			{
-				round_string(s1_new,&len1,30,&por_new);
-			}
-			
-			if (len2>30)
-			{
-				round_string(s2,&len2,30,&por_new);
-			}
-			
-			
-			from_char_to_int_array(len1,len2, a1, a2, s1_new, s2);
-			
-			if (err == NUM2_INCORRECT)
-			{
-				printf("Second number incorrect");
-			}
-			else
-			{
-				division(a1, a2,len1,len2,&chastnoe);
-			
-				s3[0] = '0';
-				s3[1] = '.';
-				s3[2] = chastnoe + '0';
-				por_new +=1;
-	
-				multiple_division(len1,len2,a1,a2,s3);
-	
-				round_string(s3,&len3,31,&por_new);
-				if (por_new>99999)
-				{
-					printf("Order of degree > 99999");
-					err = DEGREE_OVERFLOW;    
-				}
-				else
-				{
-					s3[len3]='E';
-					printf("Result of division:\n");
-					if ((zn1 && !zn2) || (!zn1 && zn2))
-					{
-						printf("-");
-					}
-					
-					for (int i = 0;i<=len3;i++)
-					{
-						printf("%c",s3[i]);
-					} 
-					printf("%d",por_new);
-				}
-			}    
-		}
-	}
+    {
+        if (s2[0] == '-')
+            zn2 = 0;
+        
+        if (s1[0] == '-')
+            zn1 = 0;
+        
+        if ((s2[0] == '+') || (s2[0] == '-'))
+        {
+            for (int i=0;i<len2-1;i++)
+            {
+                s2[i] = s2[i+1];
+            }
+            len2 -= 1;
+        }
+        if (s2[0] == '0')
+        {
+            printf("Division by 0\n");
+            err = DIVISION_BY_0;
+        }
+        else
+        {
+            err = read_first_number(&len1,s1,s1_new,&por_new);
+            if (err == NUM1_INCORRECT)
+            {
+                printf("First number incorrect\n");
+            }
+            else
+            {
+                compare_strings(&len1,&len2,&por_new,s1_new,s2);
+        
+                if (len1>30)
+                {
+                    round_string(s1_new,&len1,30,&por_new);
+                }
+                
+                if (len2>30)
+                {
+                    round_string(s2,&len2,30,&por_new);
+                }
+                
+                
+                from_char_to_int_array(len1,len2, a1, a2, s1_new, s2);
+                
+                if (err == NUM2_INCORRECT)
+                {
+                    printf("Second number incorrect");
+                }
+                else
+                {
+                    division(a1, a2,len1,len2,&chastnoe);
+                
+                    s3[0] = '0';
+                    s3[1] = '.';
+                    s3[2] = chastnoe + '0';
+                    por_new +=1;
+        
+                    multiple_division(len1,len2,a1,a2,s3);
+        
+                    round_string(s3,&len3,31,&por_new);
+                    if (por_new>99999)
+                    {
+                        printf("Order of degree > 99999");
+                        err = DEGREE_OVERFLOW;    
+                    }
+                    else
+                    {
+                        s3[len3]='E';
+                        printf("Result of division:\n");
+                        if ((zn1 && !zn2) || (!zn1 && zn2))
+                        {
+                            printf("-");
+                        }
+                        
+                        for (int i = 0;i<=len3;i++)
+                        {
+                            printf("%c",s3[i]);
+                        } 
+                        printf("%d",por_new);
+                    }
+                }    
+            }
+        }
+    }
     return err;
 }
+    
     
