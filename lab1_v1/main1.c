@@ -182,7 +182,7 @@ int read_first_number(int *len1,char *s1,char *s1_new,int *por_new)
         {
             bool1 = 1;
         }
-        else if (s1[counter1] != '-')
+        else if (s1[counter1] != '-' && s1[counter1] != '+')
         {
             err = NUM1_INCORRECT;
         }
@@ -206,7 +206,7 @@ int read_first_number(int *len1,char *s1,char *s1_new,int *por_new)
                 *por_new = *por_new*10+(s1[counter1]-'0');
                 counter3 += 1;    
             }
-            else if (s1[counter1] != '-')
+            else if (s1[counter1] != '-' && s1[counter1] != '+')
             {
                 err = NUM1_INCORRECT;
             }
