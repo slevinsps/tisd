@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h> 
 #include <ctype.h> 
+#include <math.h> 
 
 #define MAX_STRING_LENGTH1 39 //1+30+1+1+5(+)1
 #define MAX_STRING_LENGTH2 32
@@ -9,7 +10,9 @@
 #define DEGREE_OVERFLOW -1
 #define NUM1_INCORRECT -2
 #define NUM2_INCORRECT -3
-#define DIVISION_BY_0 -4
+#define NUM1_OVERFLOW -4
+#define NUM2_OVERFLOW -5
+#define DIVISION_BY_0 -6
 
 void division(int *x, int *y, int n1, int n2,int *k)
 {
@@ -162,18 +165,25 @@ void round_string(char *s,int *len,int n_round,int *por_new)
         }    
     }
 }
-
+//99999999999999999999999999999999999
 int read_first_number(int *len1,char *s1,char *s1_new,int *por_new)
 {
-    int counter1 = 0,counter3 = 0,add_por = 0,bool1 = 0,bool2 = 0,bool3 = 0,err = OK;
+    int counter1 = 0,counter3 = 0,add_por = 0,bool1 = 0,bool2 = 0,bool3 = 0,bool4 = 0,err = OK;
     *por_new = 0;
     while (s1[counter1] != 'E' && s1[counter1] != '\0')
     {
         
         if (isdigit(s1[counter1])) 
         {
-            s1_new[*len1] = s1[counter1];
-            *len1 += 1;    
+			if (s1[counter1] != '0')
+			{
+				bool4 = 1;
+			}
+			if (bool4)
+			{
+				s1_new[*len1] = s1[counter1];
+				*len1 += 1;   
+			}
             if (bool1)
             {
                 add_por += 1;
@@ -246,17 +256,27 @@ void compare_strings(int *len1,int *len2,int *por_new,char* s1_new,char* s2)
         }
         *len1 = *len2;
     }
-    
+
     if (strcmp(s1_new,s2) < 0)
     {
         s1_new[*len1] = '0';
         *len1 += 1;
         *por_new -= 1;
     }
+	/* for (int i = 0;i<*len1;i++)
+    {
+        printf("%c",s1_new[i]);
+    } 
+	printf("\n");
+	for (int i = 0;i<*len2;i++)
+    {
+        printf("%c",s2[i]);
+    } 
+	printf("\n"); */
     
 }
 
-
+// 999999999999999999999999999999
 int from_char_to_int_array(int len1, int len2, int *a1, int *a2, char *s1_new, char *s2)
 {
     int err = OK;
@@ -295,110 +315,121 @@ int main()
     int err = OK;
     int len1 = 0,len2,len3, zn1 = 1, zn2 = 1;
     setbuf(stdout,NULL);
-
-    printf("Enter first number:  ");
+	printf("Division function\n");
+	printf("First number in format +-m.nЕ+-K or m.nЕK (-99999<K<99999; length (m+n)<=30)\n");
+    printf("Enter first number:\n");
+	printf("<----------------------------->\n");
     fgets(s1, MAX_STRING_LENGTH1, stdin);
     s1[strlen(s1)-1] = '\0';
     
-    printf("Enter second number:  ");
-    fgets(s2, MAX_STRING_LENGTH2, stdin);
-    s2[strlen(s2)-1] = '\0';
-    len2 = strlen(s2);
+    
     if (strlen(s1) == 0)
     {
         printf("First number incorrect\n");
         err = NUM1_INCORRECT;
     }
-    else if (strlen(s2) == 0)
-    {
-        printf("Second number incorrect\n");
-        err = NUM2_INCORRECT;
-    }
-    else
-    {
-        if (s2[0] == '-')
-            zn2 = 0;
-        
-        if (s1[0] == '-')
-            zn1 = 0;
-        
-        if ((s2[0] == '+') || (s2[0] == '-'))
-        {
-            for (int i=0;i<len2-1;i++)
-            {
-                s2[i] = s2[i+1];
-            }
-            len2 -= 1;
-        }
-        if (s2[0] == '0')
-        {
-            printf("Division by 0\n");
-            err = DIVISION_BY_0;
-        }
-        else
-        {
-            err = read_first_number(&len1,s1,s1_new,&por_new);
-            if (err == NUM1_INCORRECT)
-            {
-                printf("First number incorrect\n");
-            }
-            else
-            {
-                compare_strings(&len1,&len2,&por_new,s1_new,s2);
-        
-                if (len1>30)
-                {
-                    round_string(s1_new,&len1,30,&por_new);
-                }
-                
-                if (len2>30)
-                {
-                    round_string(s2,&len2,30,&por_new);
-                }
-                
-                
-                from_char_to_int_array(len1,len2, a1, a2, s1_new, s2);
-                
-                if (err == NUM2_INCORRECT)
-                {
-                    printf("Second number incorrect");
-                }
-                else
-                {
-                    division(a1, a2,len1,len2,&chastnoe);
-                
-                    s3[0] = '0';
-                    s3[1] = '.';
-                    s3[2] = chastnoe + '0';
-                    por_new +=1;
-        
-                    multiple_division(len1,len2,a1,a2,s3);
-        
-                    round_string(s3,&len3,31,&por_new);
-                    if (por_new>99999)
-                    {
-                        printf("Order of degree > 99999");
-                        err = DEGREE_OVERFLOW;    
-                    }
-                    else
-                    {
-                        s3[len3]='E';
-                        printf("Result of division:\n");
-                        if ((zn1 && !zn2) || (!zn1 && zn2))
-                        {
-                            printf("-");
-                        }
-                        
-                        for (int i = 0;i<=len3;i++)
-                        {
-                            printf("%c",s3[i]);
-                        } 
-                        printf("%d",por_new);
-                    }
-                }    
-            }
-        }
-    }
+	else if (strlen(s1) > 30)
+	{
+		printf("First number length overflow\n");
+        err = NUM1_OVERFLOW;
+	}
+    else 
+	{
+		printf("Second number in format +-m or m, length m<=30)\n");
+		printf("Enter second number:\n");
+		printf("<----------------------------->\n");
+		fgets(s2, MAX_STRING_LENGTH1, stdin);
+		s2[strlen(s2)-1] = '\0';
+		len2 = strlen(s2);
+		//printf("#### %d\n",len2);
+		if (strlen(s2) == 0)
+		{
+			printf("Second number incorrect\n");
+			err = NUM2_INCORRECT;
+		}
+		
+		else
+		{
+			if (s2[0] == '-')
+				zn2 = 0;
+			
+			if (s1[0] == '-')
+				zn1 = 0;
+			
+			if ((s2[0] == '+') || (s2[0] == '-'))
+			{
+				for (int i=0;i<len2-1;i++)
+				{
+					s2[i] = s2[i+1];
+				}
+				len2 -= 1;
+			}
+			if (s2[0] == '0' && len2 == 1)
+			{
+				printf("Division by 0\n");
+				err = DIVISION_BY_0;
+			}
+			else
+			{
+				err = read_first_number(&len1,s1,s1_new,&por_new);
+				if (err == NUM1_INCORRECT)
+				{
+					printf("First number incorrect\n");
+				}
+				else
+				{
+					compare_strings(&len1,&len2,&por_new,s1_new,s2);
+						
+					
+					err = from_char_to_int_array(len1,len2, a1, a2, s1_new, s2);
+								
+					
+					if (err == NUM2_INCORRECT)
+					{
+						printf("Second number incorrect");
+					}
+					else if (strlen(s2) > 30)
+					{
+						printf("Second number length overflow\n");
+						err = NUM2_OVERFLOW;
+					}
+					else
+					{
+						division(a1, a2,len1,len2,&chastnoe);
+					
+						s3[0] = '0';
+						s3[1] = '.';
+						s3[2] = chastnoe + '0';
+						por_new +=1;
+			
+						multiple_division(len1,len2,a1,a2,s3);
+			
+						round_string(s3,&len3,31,&por_new);
+						if (fabs(por_new)>99999)
+						{
+							printf("Order of degree overflow");
+							err = DEGREE_OVERFLOW;    
+						}
+						else
+						{
+							s3[len3]='E';
+							printf("Result of division with an accuracy of 30 characters:\n");
+							if ((zn1 && !zn2) || (!zn1 && zn2))
+							{
+								printf("-");
+							}
+							
+							for (int i = 0;i<=len3;i++)
+							{
+								printf("%c",s3[i]);
+							} 
+							printf("%d",por_new);
+						}
+					}    
+				}
+			}
+		}
+	}
     return err;
 }
     
