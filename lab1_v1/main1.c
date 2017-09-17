@@ -18,49 +18,46 @@ void division(int *x, int *y, int n1, int n2,int *k)
 {
     int count1 = 1;
     int count2 = 1;
-    *k = -1;
-    
+    *k = 0;
+    /* for(int i = 0;i<n1;i++)
+			printf("%d",x[i]);
+	printf("\n"); */
     while ((count1 == 1) || (count2 == 1))
     {
-        *k += 1;
+        
         count1 = 0;
         count2 = 0;
-        for (int j = 0;j<n2;j++)
+		
+        for (int j = n2-1;j>=0;j--)
         {
             if (x[j] > y[j])
             {
-                count1 = 1;    
+				
+                count1 = 1;  
+				break;				
             }
-            else
+            else if(x[j] < y[j])
             {
-                if (x[j] == y[j])
-                {
-                    if ((j>0) && (x[j-1] < y[j-1]))
-                    {
-                        count1 = 0;   
-                    }
-                    else
-                    {
-                        count1 = 1;
-                    }
-                }
-                else
-                {
-                    count1 = 0;    
-                }
-            }
-                
-            
-        }
-        for (int j = n2;j<n1;j++)
-        {
-            if (x[j] != 0)
+                count1 = 0;
+				break;
+            }  
+			else if(x[j] == y[j])
             {
-                count2 = 1;    
-            } 
+                count1 = 1;
+            }  
         }
-        if (count1 == 1 || count2 == 1)
+		for (int j = n2;j<n1;j++)
+		{
+			if (x[j] != 0)
+			{
+				count2 = 1;    
+			} 
+		}
+		//printf("#########  %d    %d\n", n1,n2);
+		//printf("@@@@@@@@   %d   %d\n",count1,count2);
+        if ((count1 == 1) || (count2 == 1))
         {
+			*k += 1;
             for (int i=0;i<n1;i++)
             {
                 if (i <= n2-1)
@@ -92,8 +89,12 @@ void division(int *x, int *y, int n1, int n2,int *k)
                     }
                 }
             }
-        }  
-    }   
+        }
+		/* for(int i = 0;i<n1;i++)
+			printf("%d",x[i]);
+		printf("\n"); */
+    }  
+	//printf("$$$$$$$$$$$$$$   k = %d\n",*k);
 }
 
 void multiple_division(int len1, int len2, int *a1, int *a2,char* s3)
@@ -107,6 +108,7 @@ void multiple_division(int len1, int len2, int *a1, int *a2,char* s3)
         } 
         a1[0] = 0;
         division(a1, a2,len1+1,len2,&chastnoe);
+		//printf("\n");
         s3[i] = chastnoe + '0';
     }    
     
@@ -168,13 +170,14 @@ void round_string(char *s,int *len,int n_round,int *por_new)
 //99999999999999999999999999999999999
 int read_first_number(int *len1,char *s1,char *s1_new,int *por_new)
 {
-    int counter1 = 0,counter3 = 0,add_por = 0,bool1 = 0,bool2 = 0,bool3 = 0,bool4 = 0,err = OK;
+    int k = 0, counter1 = 0,counter3 = 0,add_por = 0,bool1 = 0,bool2 = 0,bool3 = 0,bool4 = 0,err = OK;
     *por_new = 0;
     while (s1[counter1] != 'E' && s1[counter1] != '\0')
     {
         
         if (isdigit(s1[counter1])) 
         {
+			k++;
             if (s1[counter1] != '0')
             {
                 bool4 = 1;
@@ -229,6 +232,10 @@ int read_first_number(int *len1,char *s1,char *s1_new,int *por_new)
         }
     }
     *por_new = *por_new - add_por;
+	if (k > 30)
+	{
+		err = NUM1_OVERFLOW;
+	}
     return err;
     
 }
@@ -279,7 +286,7 @@ void compare_strings(int *len1,int *len2,int *por_new,char* s1_new,char* s2)
 // 999999999999999999999999999999
 int from_char_to_int_array(int len1, int len2, int *a1, int *a2, char *s1_new, char *s2)
 {
-    int err = OK;
+    int err = OK, k=0;
     for (int i = len1-1;i>=0;i--)
     {
         a1[len1-1-i] = s1_new[i]-'0';
@@ -289,6 +296,7 @@ int from_char_to_int_array(int len1, int len2, int *a1, int *a2, char *s1_new, c
     {
         if (isdigit(s2[i]))
         {
+			k++;
             a2[len2-1-i] = s2[i]-'0';
         }
         else
@@ -297,6 +305,10 @@ int from_char_to_int_array(int len1, int len2, int *a1, int *a2, char *s1_new, c
             break;
         }
     }
+	if (k > 30)
+	{
+		err = NUM2_OVERFLOW;
+	}
     return err;
 }
 
@@ -318,7 +330,8 @@ int main()
     printf("Division function\n");
     printf("First number in format +-m.nЕ+-K or m.nЕK (-99999<K<99999; length (m+n)<=30)\n");
     printf("Enter first number:\n");
-    printf("<----------------------------->\n");
+	printf("0                           30\n");
+    printf("|----------------------------|\n");
     fgets(s1, MAX_STRING_LENGTH1, stdin);
     s1[strlen(s1)-1] = '\0';
     
@@ -328,16 +341,12 @@ int main()
         printf("First number incorrect\n");
         err = NUM1_INCORRECT;
     }
-    else if (strlen(s1) > 30)
-    {
-        printf("First number length overflow\n");
-        err = NUM1_OVERFLOW;
-    }
     else 
     {
         printf("Second number in format +-m or m, length m<=30)\n");
         printf("Enter second number:\n");
-        printf("<----------------------------->\n");
+		printf("0                           30\n");
+        printf("|----------------------------|\n");
         fgets(s2, MAX_STRING_LENGTH1, stdin);
         s2[strlen(s2)-1] = '\0';
         len2 = strlen(s2);
@@ -376,6 +385,10 @@ int main()
                 {
                     printf("First number incorrect\n");
                 }
+				else if (err == NUM1_OVERFLOW)
+				{
+                    printf("First number length overflow\n");
+                }
                 else
                 {
                     compare_strings(&len1,&len2,&por_new,s1_new,s2);
@@ -388,7 +401,7 @@ int main()
                     {
                         printf("Second number incorrect");
                     }
-                    else if (strlen(s2) > 30)
+                    else if (err == NUM2_OVERFLOW)
                     {
                         printf("Second number length overflow\n");
                         err = NUM2_OVERFLOW;
@@ -396,14 +409,14 @@ int main()
                     else
                     {
                         division(a1, a2,len1,len2,&chastnoe);
-                    
+						printf("\n");
                         s3[0] = '0';
                         s3[1] = '.';
                         s3[2] = chastnoe + '0';
                         por_new +=1;
             
                         multiple_division(len1,len2,a1,a2,s3);
-            
+						
                         round_string(s3,&len3,31,&por_new);
                         if (fabs(por_new)>99999)
                         {
