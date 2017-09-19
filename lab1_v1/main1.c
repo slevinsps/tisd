@@ -12,7 +12,7 @@
 #define NUM2_INCORRECT -3
 #define NUM1_OVERFLOW -4
 #define NUM2_OVERFLOW -5
-#define DIVISION_BY_0 -6cd labs
+#define DIVISION_BY_0 -6
     
 void division(int *x, int *y, int n1, int n2,int *k)
 {
@@ -162,6 +162,7 @@ int read_first_number(int *len1,char *s1,char *s1_new,int *por_new)
 {
     int k = 0, counter1 = 0,counter3 = 0,add_por = 0,bool1 = 0,bool2 = 0,bool3 = 0,bool4 = 0,err = OK;
     *por_new = 0;
+    int w1=0,w2=0,w3=0;
     while (s1[counter1] != 'E' && s1[counter1] != '\0')
     {
         
@@ -185,17 +186,22 @@ int read_first_number(int *len1,char *s1,char *s1_new,int *por_new)
         else if (s1[counter1] == '.')
         {
             bool1 = 1;
+            w1++;
         }
         else if (s1[counter1] != '-' && s1[counter1] != '+')
         {
             err = NUM1_INCORRECT;
+        }
+        if (s1[counter1] == '-' || s1[counter1] == '+')
+        {
+            w2++;
         }
         counter1 += 1;
         if (s1[counter1] == 'E')
         {
             bool3 = 1;
         }
-    }
+    }    
     if (bool3)
     {
         counter1 +=1;
@@ -214,6 +220,10 @@ int read_first_number(int *len1,char *s1,char *s1_new,int *por_new)
             {
                 err = NUM1_INCORRECT;
             }
+            if (s1[counter1] == '-' || s1[counter1] == '+')
+            {
+                w3++;
+            }
             counter1 += 1;
         }
         if (bool2)
@@ -222,6 +232,10 @@ int read_first_number(int *len1,char *s1,char *s1_new,int *por_new)
         }
     }
     *por_new = *por_new - add_por;
+    if (w1>1 || w2>1 || w3>1)
+    {
+        err = NUM1_INCORRECT;
+    }
     if (k > 30)
     {
         err = NUM1_OVERFLOW;
