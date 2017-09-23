@@ -5,20 +5,31 @@
 #define OK 0
 #define INCORRECT_NUMBER -1
 #define INVALID_DEL_ARGUMENT -2
+#define SIZE 30
 
 typedef struct Car {
-    char mark[30];
-    char country[30];
-    char price[30];
-    char color[30];
-    char state[30];
-    char mileage[30];
-    char repairs[30];
+    char mark[SIZE];
+    char country[SIZE];
+    int price;
+    char color[SIZE];
+	int used;
+	union {
+		struct {
+			int warranty;
+		} new_car;
+
+		struct {
+			int year;
+			int mileage;
+			int repairs;
+		} used_car;
+	} united;
 } Car;
+
 
 typedef struct Car_table{
     int number;
-    char price[30];
+    int price;
 } Car_table;
 
 void new_struct_table(Car *cars,Car_table **cars_tabl,int *size)
@@ -26,27 +37,72 @@ void new_struct_table(Car *cars,Car_table **cars_tabl,int *size)
 	Car_table *cars_tabl2 = (Car_table*)malloc((*size)*sizeof(Car_table));
 	for (int j = 0;j<*size;j++)
 	{
-		cars_tabl2[j].number = j;
-		for (int i = 0; i < 30;i++)
-		{
-			cars_tabl2[j].price[i] = cars[j].price[i];		
-		}
+		cars_tabl2[j].number = j;		
+		cars_tabl2[j].price = cars[j].price;		
 	}
 	*cars_tabl = cars_tabl2;
 }
 
-void read_struct(FILE *f, Car *cars,Car_table *cars_tabl,int size)
+int read_struct(FILE *f, Car *cars,int size)
 {
-	//int err = OK;
 	for (int i = 0;i<size;i++)
 	{	
-		fscanf(f,"%s %s %s %s %s %s %s", cars[i].mark,cars[i].country,cars[i].price,cars[i].color,cars[i].state,cars[i].mileage,cars[i].repairs);
-		cars_tabl[i].number = i;
-		for (int j = 0;j<30;j++)
+		if (fscanf(f,"%s", cars[i].mark)!=1)
 		{
-			cars_tabl[i].price[j] = cars[i].price[j];		
-		}			
-	}	
+			printf("Некорректно введена марка\n");
+			return -1;
+		}
+		if (fscanf(f,"%s", cars[i].country)!=1)
+		{
+			printf("Некорректно введена страна\n");
+			return -1;
+		}
+		if (fscanf(f,"%d", &cars[i].price)!=1)
+		{
+			printf("Некорректно введена цена\n");
+			return -1;
+		}
+		if (fscanf(f,"%s", cars[i].color)!=1)
+		{
+			printf("Некорректно введен цвет\n");
+			return -1;
+		}
+		if (fscanf(f,"%d", &cars[i].used)!=1)
+		{
+			printf("Некорректно введено состояние\n");
+			return -1;
+		}
+		if (cars[i].used == 1)
+		{
+			
+			
+			if (fscanf(f,"%d", &cars[i].united.used_car.year)!=1)
+			{
+				printf("Некорректно введен год\n");
+				return -1;
+			}
+			if (fscanf(f,"%d", &cars[i].united.used_car.mileage)!=1)
+			{
+				printf("Некорректно введен пробег\n");
+				return -1;
+			}
+			if (fscanf(f,"%d", &cars[i].united.used_car.repairs)!=1)
+			{
+				printf("Некорректно введено количество ремонтов\n");
+				return -1;
+			}
+		}
+		else
+		{
+			if (fscanf(f,"%d", &cars[i].united.new_car.warranty)!=1)
+			{
+				printf("Некорректно введена гарантия\n");
+				return -1;
+			}
+		}		 
+	}
+	fclose(f);
+	return OK;
 } 
 
 void rewrite_file(FILE *f, Car *cars,int size)
@@ -55,46 +111,112 @@ void rewrite_file(FILE *f, Car *cars,int size)
 	fprintf(f,"%d\n",size);
 	for (int i = 0;i<size;i++)
 	{
-		fprintf(f,"%s %s %s %s %s %s %s\n",cars[i].mark,cars[i].country,cars[i].price,cars[i].color,cars[i].state,cars[i].mileage,cars[i].repairs);
+		fprintf(f,"%s %s %d %s %d ",cars[i].mark,cars[i].country,cars[i].price,cars[i].color,cars[i].used);
+		if (cars[i].used == 1)
+			fprintf(f,"%d %d %d\n",cars[i].united.used_car.year,cars[i].united.used_car.mileage,cars[i].united.used_car.repairs);
+		else
+			fprintf(f,"%d\n",cars[i].united.new_car.warranty);
 	}	
 } 
-
 
 void print_struct(FILE *f, Car *cars,int size)
 {
 	//int err = OK;
-	printf("№     Марка     Страна        Цена       Цвет   Состояние      П-г      Ремонты\n");
+	printf("№     Марка           Страна        Цена       Цвет     Состояние      Год/      Пробег    Ремонты\n");
+	printf("                                                                     Гарантия\n");
 	for (int i = 0;i<size;i++)
 	{
-		fprintf(f,"%d %10s %10s %10s %10s %10s %10s %8s\n",i+1,cars[i].mark,cars[i].country,cars[i].price,cars[i].color,cars[i].state,cars[i].mileage,cars[i].repairs);
-	}	
+		fprintf(f,"%d %15s %10s %12d %10s %10d ",i+1,cars[i].mark,cars[i].country,cars[i].price,cars[i].color,cars[i].used);
+		if (cars[i].used == 1)
+			fprintf(f,"%10d %10d %10d\n",cars[i].united.used_car.year,cars[i].united.used_car.mileage,cars[i].united.used_car.repairs);
+		else
+			fprintf(f,"%10d\n",cars[i].united.new_car.warranty);
+	}		
 } 
 
-
-void print_struct_table(FILE *f, Car_table *cars_tabl,int size)
+void print_struct_with_key(FILE *f, Car *cars,Car_table *cars_tabl,int size)
 {
-	//int err = OK;
-	//printf("№     Марка     Страна        Цена       Цвет   Состояние      П-г      Ремонты\n");
-	for (int i = 0;i<size;i++)
+	int i;
+	for (int j = 0;j<size;j++)
 	{
-		fprintf(f,"%d %10s\n",cars_tabl[i].number,cars_tabl[i].price);
-	}	
-} 
-
-void add_record(Car **cars,int *size)
-{
-	Car *cars2;
-	*size += 1;
-	cars2 = (Car*)malloc((*size)*sizeof(Car));
+		i = cars_tabl[j].number;
+		fprintf(f,"%d %15s %10s %12d %10s %10d ",i+1,cars[i].mark,cars[i].country,cars[i].price,cars[i].color,cars[i].used);
+		if (cars[i].used == 1)
+			fprintf(f,"%10d %10d %10d\n",cars[i].united.used_car.year,cars[i].united.used_car.mileage,cars[i].united.used_car.repairs);
+		else
+			fprintf(f,"%10d\n",cars[i].united.new_car.warranty);
+	}
 	
-	for (int i=0;i<*size-1;i++)
+}
+
+int add_record(Car **cars,int *size)
+{
+	printf("Марка | Страна | Цена |  Цвет | Состояние |   Год/     | Пробег | Ремонты\n");
+	printf("                                            Гарантия\n");
+	Car *cars2;
+	//*size += 1;
+	cars2 = (Car*)malloc((*size+1)*sizeof(Car));
+	
+	for (int i=0;i<*size;i++)
 	{
 		cars2[i] = (*cars)[i];
 	}
-	int i = *size-1;
-	scanf("%s %s %s %s %s %s %s", cars2[i].mark,cars2[i].country,cars2[i].price,cars2[i].color,cars2[i].state,cars2[i].mileage,cars2[i].repairs);
-
+	int i = *size;
+	
+	if (scanf("%s", cars2[i].mark)!=1)
+	{
+		printf("Некорректно введена марка\n");
+		return -1;
+	}
+	if (scanf("%s", cars2[i].country)!=1)
+	{
+		printf("Некорректно введена страна\n");
+		return -1;
+	}
+	if (scanf("%d", &cars2[i].price)!=1)
+	{
+		printf("Некорректно введена цена\n");
+		return -1;
+	}
+	if (scanf("%s", cars2[i].color)!=1)
+	{
+		printf("Некорректно введен цве\n");
+		return -1;
+	}
+	if (scanf("%d", &cars2[i].used)!=1)
+	{
+		printf("Некорректно введено состояние\n");
+		return -1;
+	}
+	if (cars2[i].used == 1)
+	{
+		if (scanf("%d", &cars2[i].united.used_car.year)!=1)
+		{
+			printf("Некорректно введен год\n");
+			return -1;
+		}
+		if (scanf("%d", &cars2[i].united.used_car.mileage)!=1)
+		{
+			printf("Некорректно введен пробег\n");
+			return -1;
+		}
+		if (scanf("%d", &cars2[i].united.used_car.repairs)!=1)
+		{
+			printf("Некорректно введено количество ремонтов\n");
+			return -1;
+		}
+	}
+	else
+	{
+		if (scanf("%d", &cars2[i].united.new_car.warranty)!=1)
+		{
+			printf("Некорректно введена гарантия\n");
+			return -1;
+		}
+	}
+	*size += 1;
 	*cars = cars2;
+	return OK;
 }
 
 int del_record(Car **cars,int *size)
@@ -139,27 +261,69 @@ void replace_array(char *s1,char *s2,int size)
 	{
 		s2[i] = tmp[i];
 	}
-	
 }
 
 void bubble_sort_all(Car *cars,int size)
 {
-	int k1,k2;
+	int tmp;
 	for (int i = 0;i<size-1;i++)
 	{
 		for (int j = i;j<size;j++)
 		{
-			k1 = atoi(cars[i].price);
-			k2 = atoi(cars[j].price);
-			if (k1>k2)
+			if (cars[i].price>cars[j].price)
 			{		
-				replace_array(cars[i].mark,cars[j].mark,30);
-				replace_array(cars[i].country,cars[j].country,30);
-				replace_array(cars[i].price,cars[j].price,30);
+				replace_array(cars[i].mark,cars[j].mark,SIZE);
+				replace_array(cars[i].country,cars[j].country,SIZE);
+	
+				tmp = cars[i].price;
+				cars[i].price = cars[j].price;
+				cars[j].price = tmp;
 				replace_array(cars[i].color,cars[j].color,30);
-				replace_array(cars[i].state,cars[j].state,30);
-				replace_array(cars[i].mileage,cars[j].mileage,30);
-				replace_array(cars[i].repairs,cars[j].repairs,30);			
+				tmp = cars[i].used;
+				cars[i].used = cars[j].used;
+				cars[j].used = tmp;
+				if (cars[i].used == 1)
+				{
+					tmp = cars[i].united.used_car.year;
+					cars[i].united.used_car.year = cars[j].united.used_car.year;
+					cars[j].united.used_car.year = tmp;
+
+					tmp = cars[i].united.used_car.mileage;
+					cars[i].united.used_car.mileage = cars[j].united.used_car.mileage;
+					cars[j].united.used_car.mileage = tmp;
+					
+					tmp = cars[i].united.used_car.repairs;
+					cars[i].united.used_car.repairs = cars[j].united.used_car.repairs;
+					cars[j].united.used_car.repairs = tmp;
+				}
+				else
+				{
+					tmp = cars[i].united.new_car.warranty;
+					cars[i].united.new_car.warranty = cars[j].united.new_car.warranty;
+					cars[j].united.new_car.warranty = tmp;
+					
+				}	
+				if (cars[j].used == 1)
+				{
+					tmp = cars[i].united.used_car.year;
+					cars[i].united.used_car.year = cars[j].united.used_car.year;
+					cars[j].united.used_car.year = tmp;
+	
+					tmp = cars[i].united.used_car.mileage;
+					cars[i].united.used_car.mileage = cars[j].united.used_car.mileage;
+					cars[j].united.used_car.mileage = tmp;
+					
+					tmp = cars[i].united.used_car.repairs;
+					cars[i].united.used_car.repairs = cars[j].united.used_car.repairs;
+					cars[j].united.used_car.repairs = tmp;
+				}
+				else
+				{
+					tmp = cars[i].united.new_car.warranty;
+					cars[i].united.new_car.warranty = cars[j].united.new_car.warranty;
+					cars[j].united.new_car.warranty = tmp;
+				
+				}
 			}
 		}
 	}
@@ -168,17 +332,17 @@ void bubble_sort_all(Car *cars,int size)
 
 void bubble_sort_key(Car_table *cars_tabl,int size)
 {
-	int k1,k2;
 	int tmp;
 	for (int i = 0;i<size-1;i++)
 	{
 		for (int j = i;j<size;j++)
 		{
-			k1 = atoi(cars_tabl[i].price);
-			k2 = atoi(cars_tabl[j].price);
-			if (k1>k2)
+			if (cars_tabl[i].price>cars_tabl[j].price)
 			{		
-				replace_array(cars_tabl[i].price,cars_tabl[j].price,30);
+				tmp = cars_tabl[i].price;
+				cars_tabl[i].price = cars_tabl[j].price;
+				cars_tabl[j].price = tmp;
+				
 				tmp = cars_tabl[i].number;
 				cars_tabl[i].number = cars_tabl[j].number;
 				cars_tabl[j].number = tmp;
@@ -187,6 +351,117 @@ void bubble_sort_key(Car_table *cars_tabl,int size)
 	}
 }
 
+void quicksort_all(Car *cars,int l,int r)
+{
+	int tmp;
+	int i = l;
+	int j = r;
+	int x = cars[(l+r)/2].price;
+	while(1)
+	{
+		while(cars[i].price<x)
+			i++;
+		while(cars[j].price>x)
+			j--;
+		if (i<=j)
+		{
+			replace_array(cars[i].mark,cars[j].mark,SIZE);
+			replace_array(cars[i].country,cars[j].country,SIZE);
+	
+			tmp = cars[i].price;
+			cars[i].price = cars[j].price;
+			cars[j].price = tmp;
+			replace_array(cars[i].color,cars[j].color,30);
+			tmp = cars[i].used;
+			cars[i].used = cars[j].used;
+			cars[j].used = tmp;
+			if (cars[i].used == 1)
+			{
+				tmp = cars[i].united.used_car.year;
+				cars[i].united.used_car.year = cars[j].united.used_car.year;
+				cars[j].united.used_car.year = tmp;
+
+				tmp = cars[i].united.used_car.mileage;
+				cars[i].united.used_car.mileage = cars[j].united.used_car.mileage;
+				cars[j].united.used_car.mileage = tmp;
+				
+				tmp = cars[i].united.used_car.repairs;
+				cars[i].united.used_car.repairs = cars[j].united.used_car.repairs;
+				cars[j].united.used_car.repairs = tmp;
+			}
+			else
+			{
+				tmp = cars[i].united.new_car.warranty;
+				cars[i].united.new_car.warranty = cars[j].united.new_car.warranty;
+				cars[j].united.new_car.warranty = tmp;
+				
+			}
+			if (cars[j].used == 1)
+			{
+				tmp = cars[i].united.used_car.year;
+				cars[i].united.used_car.year = cars[j].united.used_car.year;
+				cars[j].united.used_car.year = tmp;
+
+				tmp = cars[i].united.used_car.mileage;
+				cars[i].united.used_car.mileage = cars[j].united.used_car.mileage;
+				cars[j].united.used_car.mileage = tmp;
+				
+				tmp = cars[i].united.used_car.repairs;
+				cars[i].united.used_car.repairs = cars[j].united.used_car.repairs;
+				cars[j].united.used_car.repairs = tmp;
+			}
+			else
+			{
+				tmp = cars[i].united.new_car.warranty;
+				cars[i].united.new_car.warranty = cars[j].united.new_car.warranty;
+				cars[j].united.new_car.warranty = tmp;
+				
+			}
+			
+			i++;
+			j--;
+		}
+		if (i>j)
+			break;
+	}
+	if (l<j)
+        quicksort_all(cars,l,j);
+    if (r>i)
+        quicksort_all(cars,i,r);
+}
+
+void quicksort_key(Car_table *cars_tabl,int l,int r)
+{
+	int tmp;
+	int i = l;
+	int j = r;
+	int x = cars_tabl[(l+r)/2].price;
+	while(1)
+	{
+		while(cars_tabl[i].price<x)
+			i++;
+		while(cars_tabl[j].price>x)
+			j--;
+		if (i<=j)
+		{
+			tmp = cars_tabl[i].price;
+			cars_tabl[i].price = cars_tabl[j].price;
+			cars_tabl[j].price = tmp;
+			
+			tmp = cars_tabl[i].number;
+			cars_tabl[i].number = cars_tabl[j].number;
+			cars_tabl[j].number = tmp;
+			i++;
+			j--;
+		}
+		if (i>j)
+			break;
+	}
+	if (l<j)
+        quicksort_key(cars_tabl,l,j);
+    if (r>i)
+        quicksort_key(cars_tabl,i,r);
+}
 
 
 int menu(Car **cars,Car_table **cars_tabl,int *size)
@@ -194,17 +469,24 @@ int menu(Car **cars,Car_table **cars_tabl,int *size)
 	FILE *f1;
 	int choice;
 	int err = OK;
+	printf("\n----------------------------------------------------------------------------------------------\n");
 	printf("МЕНЮ\n");
 	printf("1 - Показать список\n");
 	printf("2 - Добавить запись\n");
 	printf("3 - Удалить запись\n");
-	printf("4 - Отсортировать исходную таблцу по цене\n");
-	printf("5 - Отсортировать таблцу по цене используя таблицу ключей\n");
-	printf("6 - Записать изменения в файл\n\n");
+	printf("4 - Отсортировать пузырьком исходную таблцу по цене обычным способом\n");
+	printf("5 - Отсортировать пузырьком таблцу по цене используя таблицу ключей\n");
+	printf("6 - Отсортировать быстрой сортировкой таблцу по цене обычным способом\n");
+	printf("7 - Отсортировать быстрой сортировкой  таблцу по цене используя таблицу ключей\n");
+	printf("8 - Записать изменения в файл\n");
+	printf("9 - Вернуть исходый файл\n\n");
+	printf("10 - Вывести таблицу в соответствии с фильтром\n\n");
+	
 	
 	printf("0 - Выйти\n");
 	printf("Выбор: ");
 	scanf("%d",&choice);
+	new_struct_table(*cars,cars_tabl,size);
 	if (choice == 1)
 	{
 		printf("Список:\n");
@@ -212,11 +494,17 @@ int menu(Car **cars,Car_table **cars_tabl,int *size)
 	}
 	if (choice == 2)
 	{
-		printf("Введите запись:\n");
-		add_record(cars, size);
-		printf("Запись добавлена!\n");
-		new_struct_table(*cars,cars_tabl,size);
 		
+		err = add_record(cars, size);
+		if (err == OK)
+		{
+			printf("Запись добавлена!\n");
+			new_struct_table(*cars,cars_tabl,size);	
+		}
+		else
+		{
+			fflush(stdin);
+		}
 	}
 	if (choice == 3)
 	{
@@ -225,6 +513,7 @@ int menu(Car **cars,Car_table **cars_tabl,int *size)
 		err = del_record(cars, size);
 		if (err == INVALID_DEL_ARGUMENT)
 		{
+			fflush(stdin);
 			printf("Введен неверный аргумент\n");
 		}
 		else
@@ -243,20 +532,61 @@ int menu(Car **cars,Car_table **cars_tabl,int *size)
 	if (choice == 5)
 	{
 		bubble_sort_key(*cars_tabl,*size);
-		for (int j = 0;j<*size;j++)
-		{
-			int i = (*cars_tabl)[j].number;
-			printf("%d %10s %10s %10s %10s %10s %10s %8s\n",i+1,(*cars)[i].mark,(*cars)[i].country,(*cars)[i].price,(*cars)[i].color,(*cars)[i].state,(*cars)[i].mileage,(*cars)[i].repairs);
-		}
+		print_struct_with_key(stdout,*cars,*cars_tabl,*size);
+		new_struct_table(*cars,cars_tabl,size);
+	}
+	if (choice == 6)
+	{
+		quicksort_all(*cars,0,*size-1);
+		print_struct(stdout, *cars, *size);
+		new_struct_table(*cars,cars_tabl,size);
+	}
+	if (choice == 7)
+	{
+		quicksort_key(*cars_tabl,0,*size-1);
+		print_struct_with_key(stdout,*cars,*cars_tabl,*size);
+		new_struct_table(*cars,cars_tabl,size);
 	}
 	
-	if (choice == 6)
+	
+	if (choice == 8)
 	{
 		f1 = fopen("table.txt","w");
 		rewrite_file(f1, *cars, *size);
 		fclose(f1);
 		printf("Файл перезаписан!\n");
 	}
+	if (choice == 9)
+	{
+		f1 = fopen("table.txt","r");
+		fscanf(f1,"%d",size);
+		err = read_struct(f1, *cars, *size);
+		if (err == OK)
+		{
+			print_struct(stdout, *cars, *size);
+			new_struct_table(*cars,cars_tabl,size);
+			printf("Исходный массив возращен!\n");
+		}
+		else
+		{
+			fflush(stdin);
+		}
+		fclose(f1);	
+	}
+	
+	if (choice == 10)
+	{
+		for (int i = 0;i<size;i++)
+		{
+			fprintf(f,"%d %15s %10s %12d %10s %10d ",i+1,cars[i].mark,cars[i].country,cars[i].price,cars[i].color,cars[i].used);
+			if (cars[i].used == 1)
+				fprintf(f,"%10d %10d %10d\n",cars[i].united.used_car.year,cars[i].united.used_car.mileage,cars[i].united.used_car.repairs);
+			else
+				fprintf(f,"%10d\n",cars[i].united.new_car.warranty);
+		}	
+	}
+	
+	
 	if (choice == 0)
 	{
 		return 0;
@@ -267,6 +597,7 @@ int menu(Car **cars,Car_table **cars_tabl,int *size)
 
 int main(void)
 {
+	int err = OK;
 	int exit = 1;
 	FILE *f1;
 	int size;
@@ -278,12 +609,19 @@ int main(void)
 	{		
 		cars = (Car*)malloc(size*sizeof(Car));
 		cars_tabl = (Car_table*)malloc(size*sizeof(Car_table));
-		read_struct(f1, cars, cars_tabl, size);
-		fclose(f1);
-		while(exit)
+		err = read_struct(f1, cars, size);
+		if (err == OK)
 		{
-			exit = menu(&cars,&cars_tabl,&size);
+			print_struct(stdout, cars, size);
+			fclose(f1);
+			while(exit)
+			{
+				exit = menu(&cars,&cars_tabl,&size);
+			}
 		}
+
+		free(cars);
+		free(cars_tabl); 
 	}
 	else
 	{
