@@ -1,0 +1,7 @@
+6
+Audy_R3 Germany 1300000 black 1998 2000 10
+Lada_5 Russia 100 blue 2000 200 200
+BMW_X6 Germany 10000 white 2000 100 5
+Lexus Russia 34444 black 909 34 6
+LadaX Russia 4000000 yellow 0 200 200
+Ford America 10000 yellow 200000 200 200
