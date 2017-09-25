@@ -1,11 +1,14 @@
 #include <stdio.h>
+#include <errno.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 
 #define OK 0
-#define INCORRECT_NUMBER -1
+#define INCORRECT_SIZE -1
 #define INVALID_DEL_ARGUMENT -2
 #define MEMORY_ERROR -3
+#define NO_FILE -4
 #define SIZE 30
 
 typedef struct Car {
@@ -65,7 +68,7 @@ int read_struct(FILE *f, Car *cars,int size)
             printf("Некорректно введена страна\n");
             return -1;
         }
-        if (fscanf(f,"%d", &cars[i].price)!=1)
+        if (fscanf(f,"%d", &cars[i].price)!=1 || cars[i].price<0)
         {
             printf("Некорректно введена цена\n");
             return -1;
@@ -84,17 +87,17 @@ int read_struct(FILE *f, Car *cars,int size)
         {
             
             
-            if (fscanf(f,"%d", &cars[i].united.used_car.year)!=1)
+            if (fscanf(f,"%d", &cars[i].united.used_car.year)!=1 || cars[i].united.used_car.year<0)
             {
                 printf("Некорректно введен год\n");
                 return -1;
             }
-            if (fscanf(f,"%d", &cars[i].united.used_car.mileage)!=1)
+            if (fscanf(f,"%d", &cars[i].united.used_car.mileage)!=1 || cars[i].united.used_car.mileage<0)
             {
                 printf("Некорректно введен пробег\n");
                 return -1;
             }
-            if (fscanf(f,"%d", &cars[i].united.used_car.repairs)!=1)
+            if (fscanf(f,"%d", &cars[i].united.used_car.repairs)!=1 || cars[i].united.used_car.repairs<0)
             {
                 printf("Некорректно введено количество ремонтов\n");
                 return -1;
@@ -102,7 +105,7 @@ int read_struct(FILE *f, Car *cars,int size)
         }
         else
         {
-            if (fscanf(f,"%d", &cars[i].united.new_car.warranty)!=1)
+            if (fscanf(f,"%d", &cars[i].united.new_car.warranty)!=1 || cars[i].united.new_car.warranty<0)
             {
                 printf("Некорректно введена гарантия\n");
                 return -1;
@@ -128,21 +131,25 @@ void rewrite_file(FILE *f, Car *cars,int size)
 
 void print_struct(FILE *f, Car *cars,int size)
 {
-    //int err = OK;
-    printf("Если машина не новая,то состояние 1, а так же указан год выпуска\n");
-    printf("пробег и количество ремонтов, если новая, то состояние - любая другая цифра и указана гарантия\n");
-    printf("....................................................................................................\n");
-    printf("|№       Марка         Страна        Цена       Цвет     Состояние      Год/      Пробег    Ремонты|\n");
-    printf("|                                                                    Гарантия                      |\n");
-    printf("....................................................................................................\n");
-    for (int i = 0;i<size;i++)
+    if (size == 0)
+        printf("Таблица пуста!\n");
+    else
     {
-        fprintf(f,"%d %15s %10s %12d %10s %10d ",i+1,cars[i].mark,cars[i].country,cars[i].price,cars[i].color,cars[i].used);
-        if (cars[i].used == 1)
-            fprintf(f,"%10d %10d %10d\n",cars[i].united.used_car.year,cars[i].united.used_car.mileage,cars[i].united.used_car.repairs);
-        else
-            fprintf(f,"%10d\n",cars[i].united.new_car.warranty);
-    }        
+        printf("Если машина не новая,то состояние 1, а так же указан год выпуска\n");
+        printf("пробег и количество ремонтов, если новая, то состояние - любая другая цифра и указана гарантия\n");
+        printf("....................................................................................................\n");
+        printf("|№       Марка         Страна        Цена       Цвет     Состояние      Год/      Пробег    Ремонты|\n");
+        printf("|                                                                    Гарантия                      |\n");
+        printf("....................................................................................................\n");
+        for (int i = 0;i<size;i++)
+        {
+            fprintf(f,"%d %15s %10s %12d %10s %10d ",i+1,cars[i].mark,cars[i].country,cars[i].price,cars[i].color,cars[i].used);
+            if (cars[i].used == 1)
+                fprintf(f,"%10d %10d %10d\n",cars[i].united.used_car.year,cars[i].united.used_car.mileage,cars[i].united.used_car.repairs);
+            else
+                fprintf(f,"%10d\n",cars[i].united.new_car.warranty);
+        } 
+    }
 } 
 
 void print_struct_with_key(FILE *f, Car *cars,Car_table *cars_tabl,int size)
@@ -159,14 +166,16 @@ void print_struct_with_key(FILE *f, Car *cars,Car_table *cars_tabl,int size)
     }
     
 }
-
+    
 int add_record(Car **cars,int *size)
 {
     int err = OK;
     printf("Если машина не новая,то укажите состояние 1, а так же год выпуска\n");
-    printf("пробег и количество ремонтов, если новая, то состояние - любая другая цифра и укажите гарантию\n");
+    printf("пробег и количество ремонтов, если новая, то состояние - любая другая цифра и укажите гарантию.\n");
+    printf("Марка, страна, цвет - до 30 символов; цена,сосотояние,год/гарантия, пробег, ремонты - целые значения\n");
     printf("Марка | Страна | Цена |  Цвет | Состояние |   Год/     | Пробег | Ремонты\n");
     printf("                                            Гарантия\n");
+    
     //*size += 1;
     Car *ptmp = realloc(*cars, sizeof(Car)*(*size+1));
     if (ptmp)
@@ -184,7 +193,7 @@ int add_record(Car **cars,int *size)
             printf("Некорректно введена страна\n");
             return -1;
         }
-        if (scanf("%d", &(*cars)[i].price)!=1)
+        if (scanf("%d", &(*cars)[i].price)!=1 || (*cars)[i].price<0)
         {
             printf("Некорректно введена цена\n");
             return -1;
@@ -201,17 +210,17 @@ int add_record(Car **cars,int *size)
         }
         if ((*cars)[i].used == 1)
         {
-            if (scanf("%d", &(*cars)[i].united.used_car.year)!=1)
+            if (scanf("%d", &(*cars)[i].united.used_car.year)!=1 || (*cars)[i].united.used_car.year<0)
             {
                 printf("Некорректно введен год\n");
                 return -1;
             }
-            if (scanf("%d", &(*cars)[i].united.used_car.mileage)!=1)
+            if (scanf("%d", &(*cars)[i].united.used_car.mileage)!=1 || (*cars)[i].united.used_car.mileage<0)
             {
                 printf("Некорректно введен пробег\n");
                 return -1;
             }
-            if (scanf("%d", &(*cars)[i].united.used_car.repairs)!=1)
+            if (scanf("%d", &(*cars)[i].united.used_car.repairs)!=1 || (*cars)[i].united.used_car.repairs<0)
             {
                 printf("Некорректно введено количество ремонтов\n");
                 return -1;
@@ -219,7 +228,7 @@ int add_record(Car **cars,int *size)
         }
         else
         {
-            if (scanf("%d", &(*cars)[i].united.new_car.warranty)!=1)
+            if (scanf("%d", &(*cars)[i].united.new_car.warranty)!=1 || (*cars)[i].united.new_car.warranty<0)
             {
                 printf("Некорректно введена гарантия\n");
                 return -1;
@@ -284,7 +293,7 @@ void bubble_sort_all(Car *cars,int size)
                 tmp = cars[i].price;
                 cars[i].price = cars[j].price;
                 cars[j].price = tmp;
-                replace_array(cars[i].color,cars[j].color,30);
+                replace_array(cars[i].color,cars[j].color,SIZE);
                 tmp = cars[i].used;
                 cars[i].used = cars[j].used;
                 cars[j].used = tmp;
@@ -377,7 +386,7 @@ void quicksort_all(Car *cars,int l,int r)
             tmp = cars[i].price;
             cars[i].price = cars[j].price;
             cars[j].price = tmp;
-            replace_array(cars[i].color,cars[j].color,30);
+            replace_array(cars[i].color,cars[j].color,SIZE);
             tmp = cars[i].used;
             cars[i].used = cars[j].used;
             cars[j].used = tmp;
@@ -510,9 +519,19 @@ void print_filter(FILE *f,Car *cars,int size)
         printf("Результаты не найдены!\n");
     }    
 }
+
+unsigned long long tick(void)
+{
+ unsigned long long d;
+ __asm__ __volatile__ ("rdtsc" : "=A" (d) );
+ return d;
+}
     
 int menu(Car **cars,Car_table **cars_tabl,int *size)
 {
+    unsigned long long tb, te;
+    //unsigned long long t_mid;
+
     FILE *f1;
     int choice;
     int err = OK;
@@ -573,8 +592,11 @@ int menu(Car **cars,Car_table **cars_tabl,int *size)
     
     if (choice == 4)
     {
+        tb = tick();
         bubble_sort_all(*cars,*size);
+        te = tick();
         print_struct(stdout, *cars, *size);
+        printf("Время выполнения: %I64d\n",te - tb);
     }
     if (choice == 5)
     {
@@ -582,7 +604,10 @@ int menu(Car **cars,Car_table **cars_tabl,int *size)
         err = new_struct_table(*cars,cars_tabl,*size);
         if (err == OK)
         {
+            tb = tick();
             bubble_sort_key(*cars_tabl,*size);
+            te = tick();
+            printf("Время выполнения: %I64d\n",te - tb);
             print_struct_with_key(stdout,*cars,*cars_tabl,*size);
         }
         else
@@ -590,7 +615,10 @@ int menu(Car **cars,Car_table **cars_tabl,int *size)
     }
     if (choice == 6)
     {
+        tb = tick();
         quicksort_all(*cars,0,*size-1);
+        te = tick();
+        printf("Время выполнения: %I64d\n",te - tb);
         print_struct(stdout, *cars, *size);
     }
     if (choice == 7)
@@ -598,10 +626,13 @@ int menu(Car **cars,Car_table **cars_tabl,int *size)
         err = new_struct_table(*cars,cars_tabl,*size);
         if (err == OK)
         {
+            tb = tick();
             quicksort_key(*cars_tabl,0,*size-1);
+            te = tick();
+            printf("Время выполнения: %I64d\n",te - tb);
             print_struct_with_key(stdout,*cars,*cars_tabl,*size);
         }
-        else
+        else    
             printf("Memory error!");
   
     }
@@ -655,43 +686,53 @@ int main(void)
     Car *cars;
     Car_table *cars_tabl;
     setbuf(stdout,NULL);
+    srand(time(NULL));
     f1 = fopen("table.txt","r");
-    if (fscanf(f1,"%d",&size) == 1)
-    {        
-        cars = (Car*)malloc(size*sizeof(Car));
-        if (!cars)
-        {
-            printf("Memory error!\n");
-            err = MEMORY_ERROR;
-        }
-        else
-        {
-            cars_tabl = (Car_table*)malloc(size*sizeof(Car_table));
-            if (!cars_tabl)
-            {
-                printf("Memory error!\n");
-                err = MEMORY_ERROR;
-            }            
-            else
-            {
-                err = read_struct(f1, cars, size);
-                if (err == OK)
-                {
-                    print_struct(stdout, cars, size);
-                    fclose(f1);
-                    while(exit)
-                    {
-                        exit = menu(&cars,&cars_tabl,&size);
-                    }
-                }
-                free(cars);
-                free(cars_tabl); 
-            }
-        }
+    if (f1 == NULL)
+    {
+        fprintf(stderr, "%s\n",strerror(errno));
+        err = NO_FILE;
     }
     else
     {
-        printf("Error");
-    }
+        if (fscanf(f1,"%d",&size) == 1)
+        {        
+            cars = (Car*)malloc(size*sizeof(Car));
+            if (!cars)
+            {
+                printf("Memory error!\n");
+                err = MEMORY_ERROR;
+            }
+            else
+            {
+                cars_tabl = (Car_table*)malloc(size*sizeof(Car_table));
+                if (!cars_tabl)
+                {
+                    printf("Memory error!\n");
+                    err = MEMORY_ERROR;
+                }            
+                else
+                {
+                    err = read_struct(f1, cars, size);
+                    if (err == OK)
+                    {
+                        print_struct(stdout, cars, size);
+                        fclose(f1);
+                        while(exit)
+                        {
+                            exit = menu(&cars,&cars_tabl,&size);
+                        }
+                    }
+                    free(cars);
+                    free(cars_tabl); 
+                }
+            }
+        }
+        else
+        {
+            err = INCORRECT_SIZE;
+            printf("Incorrect size in file!\n");
+        }
+    }    
     return err;
 }
