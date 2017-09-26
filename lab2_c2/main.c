@@ -143,7 +143,7 @@ void print_struct(FILE *f, Car *cars,int size)
         printf("....................................................................................................\n");
         for (int i = 0;i<size;i++)
         {
-            fprintf(f,"%d %15s %10s %12d %10s %10d ",i+1,cars[i].mark,cars[i].country,cars[i].price,cars[i].color,cars[i].used);
+            fprintf(f,"%2d %15s %10s %12d %10s %10d ",i+1,cars[i].mark,cars[i].country,cars[i].price,cars[i].color,cars[i].used);
             if (cars[i].used == 1)
                 fprintf(f,"%10d %10d %10d\n",cars[i].united.used_car.year,cars[i].united.used_car.mileage,cars[i].united.used_car.repairs);
             else
@@ -158,7 +158,7 @@ void print_struct_with_key(FILE *f, Car *cars,Car_table *cars_tabl,int size)
     for (int j = 0;j<size;j++)
     {
         i = cars_tabl[j].number;
-        fprintf(f,"%d %15s %10s %12d %10s %10d ",i+1,cars[i].mark,cars[i].country,cars[i].price,cars[i].color,cars[i].used);
+        fprintf(f,"%2d %15s %10s %12d %10s %10d ",j+1,cars[i].mark,cars[i].country,cars[i].price,cars[i].color,cars[i].used);
         if (cars[i].used == 1)
             fprintf(f,"%10d %10d %10d\n",cars[i].united.used_car.year,cars[i].united.used_car.mileage,cars[i].united.used_car.repairs);
         else
@@ -479,7 +479,7 @@ void quicksort_key(Car_table *cars_tabl,int l,int r)
 }
 
 
-void print_filter(FILE *f,Car *cars,int size)
+void print_filter(FILE *f,Car *cars,Car_table *cars_tabl,int size)
 {
     printf("Фильтр: не новая машина, цвет -------, с пробегом меньше 10 тыс. км и отсутствием ремонта\n");
     char color[SIZE];
@@ -506,7 +506,7 @@ void print_filter(FILE *f,Car *cars,int size)
             if (count)
             {
                 i_new++;
-                fprintf(f,"%d %15s %10s %12d %10s %10d ",i_new,cars[i].mark,cars[i].country,cars[i].price,cars[i].color,cars[i].used);
+                fprintf(f,"%2d %15s %10s %12d %10s %10d ",i_new,cars[i].mark,cars[i].country,cars[i].price,cars[i].color,cars[i].used);
                 if (cars[i].used == 1)
                     fprintf(f,"%10d %10d %10d\n",cars[i].united.used_car.year,cars[i].united.used_car.mileage,cars[i].united.used_car.repairs);
                 else
@@ -519,7 +519,6 @@ void print_filter(FILE *f,Car *cars,int size)
         printf("Результаты не найдены!\n");
     }    
 }
-
 unsigned long long tick(void)
 {
  unsigned long long d;
@@ -527,10 +526,65 @@ unsigned long long tick(void)
  return d;
 }
     
+void print_time(Car *cars, Car_table *cars_tabl,int size)
+{
+    FILE *f1;
+    unsigned long long tb, te;
+    unsigned long long t_mid = 0;
+    for(int i = 0;i<100;i++)
+    {
+        //print_struct(stdout, cars, size);
+        tb = tick();
+        bubble_sort_all(cars,size);
+        te = tick();
+        t_mid += (te - tb);
+        //printf("t_mid = %I64d\n",t_mid);
+        f1 = fopen("table.txt","r");
+        fscanf(f1,"%d",&size);
+        read_struct(f1, cars, size);
+        fclose(f1);    
+        //print_struct(stdout, cars, size);
+    }    
+    printf("Время выполнения обычной сортировки пузырьком: %I64d\n",t_mid/100);
+    t_mid = 0;
+    for(int i = 0;i<100;i++)
+    {
+        tb = tick();
+        bubble_sort_key(cars_tabl,size);
+        te = tick();
+        t_mid += (te - tb);
+        new_struct_table(cars,&cars_tabl,size);
+    }    
+    printf("Время выполнения сортировки пузырьком с помощью ключей: %I64d\n",t_mid/100);
+    t_mid = 0;
+    for(int i = 0;i<100;i++)
+    {
+        tb = tick();
+        quicksort_all(cars,0,size-1);
+        te = tick();
+        t_mid += (te - tb);
+        f1 = fopen("table.txt","r");
+        fscanf(f1,"%d",&size);
+        read_struct(f1, cars, size);
+        fclose(f1);    
+    }    
+    printf("Время выполнения обычной быстрой сортировки: %I64d\n",t_mid/100);
+    t_mid = 0;
+    for(int i = 0;i<100;i++)
+    {
+        tb = tick();
+        quicksort_key(cars_tabl,0,size-1);
+        te = tick();
+        t_mid += (te - tb);
+        new_struct_table(cars,&cars_tabl,size);
+    }    
+    printf("Время выполнения быстрой сортировки с помощью ключей: %I64d\n",t_mid/100);
+}
+    
+
 int menu(Car **cars,Car_table **cars_tabl,int *size)
 {
-    unsigned long long tb, te;
-    //unsigned long long t_mid;
+    
 
     FILE *f1;
     int choice;
@@ -546,136 +600,136 @@ int menu(Car **cars,Car_table **cars_tabl,int *size)
     printf("7 - Отсортировать быстрой сортировкой  таблцу по цене используя таблицу ключей\n");
     printf("8 - Записать изменения в файл\n");
     printf("9 - Вернуть исходый файл\n");
-    printf("10 - Вывести таблицу в соответствии с фильтром\n\n");
+    printf("10 - Вывести таблицу в соответствии с фильтром\n");
+    printf("11 - Вывести время сортировок\n\n");
     
     
     printf("0 - Выйти\n");
     printf("Выбор: ");
-    scanf("%d",&choice);
-    if (choice == 1)
+    if (scanf("%d",&choice) != 1 || choice>12 || choice<0)
     {
-        printf("Список:\n");
-        print_struct(stdout, *cars, *size);    
-    }
-    if (choice == 2)
-    {
-        
-        err = add_record(cars, size);
-        if (err == OK)
-        {
-            printf("Запись добавлена!\n");
-        }
-        if (err == MEMORY_ERROR)
-        {
-            printf("Memory error!");
-        }
-        if (err == -1)
-        {
-            fflush(stdin);
-        }
-    }
-    if (choice == 3)
-    {
-        print_struct(stdout, *cars, *size);
-        printf("Введите номер машины:\n");
-        err = del_record(cars, size);
-        if (err == INVALID_DEL_ARGUMENT)
-        {
-            fflush(stdin);
-            printf("Введен неверный аргумент\n");
-        }
-        else
-        {
-            printf("Запись удалена!\n");
-        }
-    }
-    
-    if (choice == 4)
-    {
-        tb = tick();
-        bubble_sort_all(*cars,*size);
-        te = tick();
-        print_struct(stdout, *cars, *size);
-        printf("Время выполнения: %I64d\n",te - tb);
-    }
-    if (choice == 5)
-    {
-        err = OK;
-        err = new_struct_table(*cars,cars_tabl,*size);
-        if (err == OK)
-        {
-            tb = tick();
-            bubble_sort_key(*cars_tabl,*size);
-            te = tick();
-            printf("Время выполнения: %I64d\n",te - tb);
-            print_struct_with_key(stdout,*cars,*cars_tabl,*size);
-        }
-        else
-            printf("Memory error!");
-    }
-    if (choice == 6)
-    {
-        tb = tick();
-        quicksort_all(*cars,0,*size-1);
-        te = tick();
-        printf("Время выполнения: %I64d\n",te - tb);
-        print_struct(stdout, *cars, *size);
-    }
-    if (choice == 7)
-    {
-        err = new_struct_table(*cars,cars_tabl,*size);
-        if (err == OK)
-        {
-            tb = tick();
-            quicksort_key(*cars_tabl,0,*size-1);
-            te = tick();
-            printf("Время выполнения: %I64d\n",te - tb);
-            print_struct_with_key(stdout,*cars,*cars_tabl,*size);
-        }
-        else    
-            printf("Memory error!");
-  
-    }
-    
-    
-    if (choice == 8)
-    {
-        f1 = fopen("table.txt","w");
-        rewrite_file(f1, *cars, *size);
-        fclose(f1);
-        printf("Файл перезаписан!\n");
-    }
-    if (choice == 9)
-    {
-        f1 = fopen("table.txt","r");
-        fscanf(f1,"%d",size);
-        err = read_struct(f1, *cars, *size);
-        if (err == OK)
-        {
-            print_struct(stdout, *cars, *size);
-            printf("Исходный массив возращен!\n");
-        }
-        else
-        {
-            fflush(stdin);
-        }
-        fclose(f1);    
-    }
-    
-    if (choice == 10)
-    {
-        print_filter(stdout,*cars,*size);
+        printf("Неверный аргумент меню!");
         fflush(stdin);
     }
-    
-    
-    if (choice == 0)
+    else
     {
-        return 0;
+        if (choice == 1)
+        {
+            printf("Список:\n");
+            print_struct(stdout, *cars, *size);    
+        }
+        if (choice == 2)
+        {
+            
+            err = add_record(cars, size);
+            if (err == OK)
+            {
+                printf("Запись добавлена!\n");
+            }
+            if (err == MEMORY_ERROR)
+            {
+                printf("Memory error!");
+            }
+            if (err == -1)
+            {
+                fflush(stdin);
+            }
+        }
+        if (choice == 3)
+        {
+            print_struct(stdout, *cars, *size);
+            printf("Введите номер машины:\n");
+            err = del_record(cars, size);
+            if (err == INVALID_DEL_ARGUMENT)
+            {
+                fflush(stdin);
+                printf("Введен неверный аргумент\n");
+            }
+            else
+            {
+                printf("Запись удалена!\n");
+            }
+        }
+        
+        if (choice == 4)
+        {
+            bubble_sort_all(*cars,*size);
+            print_struct(stdout, *cars, *size);
+        }
+        if (choice == 5)
+        {
+            err = OK;
+            err = new_struct_table(*cars,cars_tabl,*size);
+            if (err == OK)
+            {
+                bubble_sort_key(*cars_tabl,*size);
+                print_struct_with_key(stdout,*cars,*cars_tabl,*size);
+            }
+            else
+                printf("Memory error!");
+        }
+        if (choice == 6)
+        {
+            quicksort_all(*cars,0,*size-1);
+            print_struct(stdout, *cars, *size);
+        }
+        if (choice == 7)
+        {
+            err = new_struct_table(*cars,cars_tabl,*size);
+            if (err == OK)
+            {
+                quicksort_key(*cars_tabl,0,*size-1);
+                print_struct_with_key(stdout,*cars,*cars_tabl,*size);
+            }
+            else    
+                printf("Memory error!");
+    
+        }
+        
+        
+        if (choice == 8)
+        {
+            f1 = fopen("table.txt","w");
+            rewrite_file(f1, *cars, *size);
+            fclose(f1);
+            printf("Файл перезаписан!\n");
+        }
+        if (choice == 9)
+        {
+            f1 = fopen("table.txt","r");
+            fscanf(f1,"%d",size);
+            err = read_struct(f1, *cars, *size);
+            if (err == OK)
+            {
+                print_struct(stdout, *cars, *size);
+                printf("Исходный массив возращен!\n");
+            }
+            else
+            {
+                fflush(stdin);
+            }
+            fclose(f1);    
+        }
+        
+        if (choice == 10)
+        {
+            print_filter(stdout,*cars,*cars_tabl,*size);
+            fflush(stdin);
+        }
+        if (choice == 11)
+        {    
+            print_time(*cars,*cars_tabl,*size);  
+        }
+        if (choice == 0)
+        {
+            return 0;
+        }
     }
+    
+    
     return 1;
 }
-
+    
 
 int main(void)
 {
