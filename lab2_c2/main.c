@@ -169,8 +169,8 @@ void print_struct_with_key(FILE *f, Car *cars,Car_table *cars_tabl,int size)
     
 int add_record(Car **cars,int *size)
 {
-    int err = OK;
-    printf("Если машина не новая,то укажите состояние 1, а так же год выпуска\n");
+    int err = OK;    
+    printf("Значения вводить через пробел. Если машина не новая,то укажите состояние 1, а так же год выпуска\n");
     printf("пробег и количество ремонтов, если новая, то состояние - любая другая цифра и укажите гарантию.\n");
     printf("Марка, страна, цвет - до 30 символов; цена,сосотояние,год/гарантия, пробег, ремонты - целые значения\n");
     printf("Марка | Страна | Цена |  Цвет | Состояние |   Год/     | Пробег | Ремонты\n");
@@ -261,84 +261,18 @@ int del_record(Car **cars,int *size)
     return err;
 }
 
-void replace_array(char *s1,char *s2,int size)
-{
-    char tmp[size];
-    for (int i = 0;i < size; i++)
-    {
-        tmp[i] = s1[i];
-    }
-    for (int i = 0;i < size; i++)
-    {
-        s1[i] = s2[i];
-    }
-    for (int i = 0;i < size; i++)
-    {
-        s2[i] = tmp[i];
-    }
-}
-
 void bubble_sort_all(Car *cars,int size)
 {
-    int tmp;
+    Car vedro;
     for (int i = 0;i<size-1;i++)
     {
         for (int j = i;j<size;j++)
         {
             if (cars[i].price>cars[j].price)
-            {        
-                replace_array(cars[i].mark,cars[j].mark,SIZE);
-                replace_array(cars[i].country,cars[j].country,SIZE);
-    
-                tmp = cars[i].price;
-                cars[i].price = cars[j].price;
-                cars[j].price = tmp;
-                replace_array(cars[i].color,cars[j].color,SIZE);
-                tmp = cars[i].used;
-                cars[i].used = cars[j].used;
-                cars[j].used = tmp;
-                if (cars[i].used == 1)
-                {
-                    tmp = cars[i].united.used_car.year;
-                    cars[i].united.used_car.year = cars[j].united.used_car.year;
-                    cars[j].united.used_car.year = tmp;
-
-                    tmp = cars[i].united.used_car.mileage;
-                    cars[i].united.used_car.mileage = cars[j].united.used_car.mileage;
-                    cars[j].united.used_car.mileage = tmp;
-                    
-                    tmp = cars[i].united.used_car.repairs;
-                    cars[i].united.used_car.repairs = cars[j].united.used_car.repairs;
-                    cars[j].united.used_car.repairs = tmp;
-                }
-                else
-                {
-                    tmp = cars[i].united.new_car.warranty;
-                    cars[i].united.new_car.warranty = cars[j].united.new_car.warranty;
-                    cars[j].united.new_car.warranty = tmp;
-                    
-                }    
-                if (cars[j].used == 1)
-                {
-                    tmp = cars[i].united.used_car.year;
-                    cars[i].united.used_car.year = cars[j].united.used_car.year;
-                    cars[j].united.used_car.year = tmp;
-    
-                    tmp = cars[i].united.used_car.mileage;
-                    cars[i].united.used_car.mileage = cars[j].united.used_car.mileage;
-                    cars[j].united.used_car.mileage = tmp;
-                    
-                    tmp = cars[i].united.used_car.repairs;
-                    cars[i].united.used_car.repairs = cars[j].united.used_car.repairs;
-                    cars[j].united.used_car.repairs = tmp;
-                }
-                else
-                {
-                    tmp = cars[i].united.new_car.warranty;
-                    cars[i].united.new_car.warranty = cars[j].united.new_car.warranty;
-                    cars[j].united.new_car.warranty = tmp;
-                
-                }
+            {     
+                vedro = cars[i];
+                cars[i] = cars[j];
+                cars[j] = vedro;
             }
         }
     }
@@ -347,20 +281,16 @@ void bubble_sort_all(Car *cars,int size)
 
 void bubble_sort_key(Car_table *cars_tabl,int size)
 {
-    int tmp;
+    Car_table vedro;
     for (int i = 0;i<size-1;i++)
     {
         for (int j = i;j<size;j++)
         {
             if (cars_tabl[i].price>cars_tabl[j].price)
             {        
-                tmp = cars_tabl[i].price;
-                cars_tabl[i].price = cars_tabl[j].price;
-                cars_tabl[j].price = tmp;
-                
-                tmp = cars_tabl[i].number;
-                cars_tabl[i].number = cars_tabl[j].number;
-                cars_tabl[j].number = tmp;
+                vedro = cars_tabl[i];
+                cars_tabl[i] = cars_tabl[j];
+                cars_tabl[j] = vedro;
             }
         }
     }
@@ -368,10 +298,10 @@ void bubble_sort_key(Car_table *cars_tabl,int size)
 
 void quicksort_all(Car *cars,int l,int r)
 {
-    int tmp;
     int i = l;
     int j = r;
     int x = cars[(l+r)/2].price;
+    Car vedro;
     while(1)
     {
         while(cars[i].price<x)
@@ -380,58 +310,9 @@ void quicksort_all(Car *cars,int l,int r)
             j--;
         if (i<=j)
         {
-            replace_array(cars[i].mark,cars[j].mark,SIZE);
-            replace_array(cars[i].country,cars[j].country,SIZE);
-    
-            tmp = cars[i].price;
-            cars[i].price = cars[j].price;
-            cars[j].price = tmp;
-            replace_array(cars[i].color,cars[j].color,SIZE);
-            tmp = cars[i].used;
-            cars[i].used = cars[j].used;
-            cars[j].used = tmp;
-            if (cars[i].used == 1)
-            {
-                tmp = cars[i].united.used_car.year;
-                cars[i].united.used_car.year = cars[j].united.used_car.year;
-                cars[j].united.used_car.year = tmp;
-
-                tmp = cars[i].united.used_car.mileage;
-                cars[i].united.used_car.mileage = cars[j].united.used_car.mileage;
-                cars[j].united.used_car.mileage = tmp;
-                
-                tmp = cars[i].united.used_car.repairs;
-                cars[i].united.used_car.repairs = cars[j].united.used_car.repairs;
-                cars[j].united.used_car.repairs = tmp;
-            }
-            else
-            {
-                tmp = cars[i].united.new_car.warranty;
-                cars[i].united.new_car.warranty = cars[j].united.new_car.warranty;
-                cars[j].united.new_car.warranty = tmp;
-                
-            }
-            if (cars[j].used == 1)
-            {
-                tmp = cars[i].united.used_car.year;
-                cars[i].united.used_car.year = cars[j].united.used_car.year;
-                cars[j].united.used_car.year = tmp;
-
-                tmp = cars[i].united.used_car.mileage;
-                cars[i].united.used_car.mileage = cars[j].united.used_car.mileage;
-                cars[j].united.used_car.mileage = tmp;
-                
-                tmp = cars[i].united.used_car.repairs;
-                cars[i].united.used_car.repairs = cars[j].united.used_car.repairs;
-                cars[j].united.used_car.repairs = tmp;
-            }
-            else
-            {
-                tmp = cars[i].united.new_car.warranty;
-                cars[i].united.new_car.warranty = cars[j].united.new_car.warranty;
-                cars[j].united.new_car.warranty = tmp;
-                
-            }
+            vedro = cars[i];
+            cars[i] = cars[j];
+            cars[j] = vedro;
             
             i++;
             j--;
@@ -447,10 +328,10 @@ void quicksort_all(Car *cars,int l,int r)
 
 void quicksort_key(Car_table *cars_tabl,int l,int r)
 {
-    int tmp;
     int i = l;
     int j = r;
     int x = cars_tabl[(l+r)/2].price;
+    Car_table vedro;
     while(1)
     {
         while(cars_tabl[i].price<x)
@@ -459,13 +340,9 @@ void quicksort_key(Car_table *cars_tabl,int l,int r)
             j--;
         if (i<=j)
         {
-            tmp = cars_tabl[i].price;
-            cars_tabl[i].price = cars_tabl[j].price;
-            cars_tabl[j].price = tmp;
-            
-            tmp = cars_tabl[i].number;
-            cars_tabl[i].number = cars_tabl[j].number;
-            cars_tabl[j].number = tmp;
+            vedro = cars_tabl[i];
+            cars_tabl[i] = cars_tabl[j];
+            cars_tabl[j] = vedro;
             i++;
             j--;
         }
@@ -531,31 +408,38 @@ void print_time(Car *cars, Car_table *cars_tabl,int size)
     FILE *f1;
     unsigned long long tb, te;
     unsigned long long t_mid = 0;
+    unsigned long long znach;
+    unsigned long long znach1;        
+    int k;
     for(int i = 0;i<100;i++)
     {
-        //print_struct(stdout, cars, size);
         tb = tick();
         bubble_sort_all(cars,size);
         te = tick();
         t_mid += (te - tb);
-        //printf("t_mid = %I64d\n",t_mid);
         f1 = fopen("table.txt","r");
         fscanf(f1,"%d",&size);
         read_struct(f1, cars, size);
         fclose(f1);    
-        //print_struct(stdout, cars, size);
     }    
     printf("Время выполнения обычной сортировки пузырьком: %I64d\n",t_mid/100);
+    znach = t_mid/100;
+    znach1 = t_mid/100;
     t_mid = 0;
     for(int i = 0;i<100;i++)
     {
         tb = tick();
         bubble_sort_key(cars_tabl,size);
+        for (int j = 0;j<size;j++)
+        {
+            k = cars_tabl[j].number;
+        }
         te = tick();
         t_mid += (te - tb);
         new_struct_table(cars,&cars_tabl,size);
     }    
     printf("Время выполнения сортировки пузырьком с помощью ключей: %I64d\n",t_mid/100);
+    printf("Выигрыш в скорости составил %f %%\n",100-((double)(t_mid/100)/(double)znach)*100);
     t_mid = 0;
     for(int i = 0;i<100;i++)
     {
@@ -569,16 +453,26 @@ void print_time(Car *cars, Car_table *cars_tabl,int size)
         fclose(f1);    
     }    
     printf("Время выполнения обычной быстрой сортировки: %I64d\n",t_mid/100);
+    znach = t_mid/100;
     t_mid = 0;
     for(int i = 0;i<100;i++)
     {
         tb = tick();
         quicksort_key(cars_tabl,0,size-1);
+        for (int j = 0;j<size;j++)
+        {
+            k = cars_tabl[j].number;
+        }
         te = tick();
         t_mid += (te - tb);
         new_struct_table(cars,&cars_tabl,size);
     }    
     printf("Время выполнения быстрой сортировки с помощью ключей: %I64d\n",t_mid/100);
+    printf("Выигрыш в скорости составил %f %%\n",100-((double)(t_mid/100)/(double)znach)*100);
+    printf("Выигрыш в скорости составил %f %%\n",100-((double)(t_mid/100)/(double)znach1)*100);
+    printf("Размер таблицы ключей  = %d бит; Размер всей таблицы = %d бит\n",(int)sizeof(Car_table)*size,(int)sizeof(Car)*size);
+    printf("Проигрыш в памяти составил %f %%\n",100 - ((double)sizeof(Car)/(double)(sizeof(Car)+(double)sizeof(Car_table)))* 100);
+    
 }
     
 
@@ -601,7 +495,7 @@ int menu(Car **cars,Car_table **cars_tabl,int *size)
     printf("8 - Записать изменения в файл\n");
     printf("9 - Вернуть исходый файл\n");
     printf("10 - Вывести таблицу в соответствии с фильтром\n");
-    printf("11 - Вывести время сортировок\n\n");
+    printf("11 - Вывести выигрыш по времени сортировок и проигрыш по памяти\n\n");
     
     
     printf("0 - Выйти\n");
@@ -749,7 +643,7 @@ int main(void)
     }
     else
     {
-        if (fscanf(f1,"%d",&size) == 1)
+        if (fscanf(f1,"%d",&size) == 1  && size>=0)
         {        
             cars = (Car*)malloc(size*sizeof(Car));
             if (!cars)
