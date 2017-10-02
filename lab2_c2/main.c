@@ -374,13 +374,13 @@ void print_filter(FILE *f,Car *cars,Car_table *cars_tabl,int size)
     {
         if (cars[i].used == 1 && cars[i].united.used_car.mileage < 10000 && cars[i].united.used_car.repairs == 0)
         {
-            
+            count = 1;
             for (int j=0; j< strlen(color);j++)
             {
                 if (cars[i].color[j] != color[j])
                     count = 0;
             }
-            if (count)
+            if (count)        
             {
                 i_new++;
                 fprintf(f,"%2d %15s %10s %12d %10s %10d ",i_new,cars[i].mark,cars[i].country,cars[i].price,cars[i].color,cars[i].used);
@@ -406,12 +406,13 @@ unsigned long long tick(void)
 void print_time(Car *cars, Car_table *cars_tabl,int size)
 {
     FILE *f1;
+    int kol = 1000;
     unsigned long long tb, te;
     unsigned long long t_mid = 0;
     unsigned long long znach;
     unsigned long long znach1;        
     int k;
-    for(int i = 0;i<100;i++)
+    for(int i = 0;i<kol;i++)
     {
         tb = tick();
         bubble_sort_all(cars,size);
@@ -422,11 +423,11 @@ void print_time(Car *cars, Car_table *cars_tabl,int size)
         read_struct(f1, cars, size);
         fclose(f1);    
     }    
-    printf("Время выполнения обычной сортировки пузырьком: %I64d\n",t_mid/100);
-    znach = t_mid/100;
-    znach1 = t_mid/100;
+    printf("Время выполнения обычной сортировки пузырьком: %I64d\n",t_mid/kol);
+    znach = t_mid/kol;
+    znach1 = t_mid/kol;
     t_mid = 0;
-    for(int i = 0;i<100;i++)
+    for(int i = 0;i<kol;i++)
     {
         tb = tick();
         bubble_sort_key(cars_tabl,size);
@@ -438,10 +439,11 @@ void print_time(Car *cars, Car_table *cars_tabl,int size)
         t_mid += (te - tb);
         new_struct_table(cars,&cars_tabl,size);
     }    
-    printf("Время выполнения сортировки пузырьком с помощью ключей: %I64d\n",t_mid/100);
-    printf("Выигрыш в скорости составил %f %%\n",100-((double)(t_mid/100)/(double)znach)*100);
+    printf("Время выполнения сортировки пузырьком с помощью ключей: %I64d\n",t_mid/kol);
+    printf("Выигрыш в скорости составил %f %%\n",100-((double)(t_mid/kol)/(double)znach)*100);
+    printf("--------------------------------\n");
     t_mid = 0;
-    for(int i = 0;i<100;i++)
+    for(int i = 0;i<kol;i++)
     {
         tb = tick();
         quicksort_all(cars,0,size-1);
@@ -452,10 +454,10 @@ void print_time(Car *cars, Car_table *cars_tabl,int size)
         read_struct(f1, cars, size);
         fclose(f1);    
     }    
-    printf("Время выполнения обычной быстрой сортировки: %I64d\n",t_mid/100);
-    znach = t_mid/100;
+    printf("Время выполнения обычной быстрой сортировки: %I64d\n",t_mid/kol);
+    znach = t_mid/kol;
     t_mid = 0;
-    for(int i = 0;i<100;i++)
+    for(int i = 0;i<kol;i++)
     {
         tb = tick();
         quicksort_key(cars_tabl,0,size-1);
@@ -466,10 +468,13 @@ void print_time(Car *cars, Car_table *cars_tabl,int size)
         te = tick();
         t_mid += (te - tb);
         new_struct_table(cars,&cars_tabl,size);
-    }    
-    printf("Время выполнения быстрой сортировки с помощью ключей: %I64d\n",t_mid/100);
-    printf("Выигрыш в скорости составил %f %%\n",100-((double)(t_mid/100)/(double)znach)*100);
-    printf("Выигрыш в скорости составил %f %%\n",100-((double)(t_mid/100)/(double)znach1)*100);
+    }  
+    (void)k;
+    printf("Время выполнения быстрой сортировки с помощью ключей: %I64d\n",t_mid/kol);
+    printf("Выигрыш в скорости составил %f %%\n",100-((double)(t_mid/kol)/(double)znach)*100);
+    printf("--------------------------------\n");
+    printf("Общий выигрыш в скорости составил %f %%\n",100-((double)(t_mid/kol)/(double)znach1)*100);
+    printf("--------------------------------\n");
     printf("Размер таблицы ключей  = %d бит; Размер всей таблицы = %d бит\n",(int)sizeof(Car_table)*size,(int)sizeof(Car)*size);
     printf("Проигрыш в памяти составил %f %%\n",100 - ((double)sizeof(Car)/(double)(sizeof(Car)+(double)sizeof(Car_table)))* 100);
     

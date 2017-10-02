@@ -5,10 +5,12 @@ BMW_X6 Germany 10000 white 1 2000 100 5
 Lexus Russia 34444 black 1 909 34 0
 Ford America 34444 black 1 2015 200 0
 FordMustang America 1000000 black 0 100
-Audi_R3 Germany 1300000 black 1 10 200 200
 Porche Italy 2000000 red 1 1999 20000 20
 Mercedes Germany 233333 pink 1 1980 20000 20
 Chevrolet America 5656565 black 1 2000 1000 0
+Bugatti Italy 851545 black 0 540
+Lada_5 Russia 12647 blue 1 2010 10000 20
+BMW_i8 Germany 5487225 white 0 200
 Audi_R3 Germany 1300000 black 1 1998 2000 10
 Lada_5 Russia 100 blue 1 2000 200 200
 BMW_X6 Germany 10000 white 1 2000 100 5
@@ -19,6 +21,9 @@ Audi_R3 Germany 1300000 black 1 10 200 200
 Porche Italy 2000000 red 1 1999 20000 20
 Mercedes Germany 233333 pink 1 1980 20000 20
 Chevrolet America 5656565 black 1 2000 1000 0
+Bugatti Italy 851545 black 0 540
+Lada_5 Russia 12647 blue 1 2010 10000 20
+BMW_i8 Germany 5487225 white 0 200
 Audi_R3 Germany 1300000 black 1 1998 2000 10
 Lada_5 Russia 100 blue 1 2000 200 200
 BMW_X6 Germany 10000 white 1 2000 100 5
@@ -29,13 +34,8 @@ Audi_R3 Germany 1300000 black 1 10 200 200
 Porche Italy 2000000 red 1 1999 20000 20
 Mercedes Germany 233333 pink 1 1980 20000 20
 Chevrolet America 5656565 black 1 2000 1000 0
-Audi_R3 Germany 1300000 black 1 1998 2000 10
-Lada_5 Russia 100 blue 1 2000 200 200
-BMW_X6 Germany 10000 white 1 2000 100 5
-Lexus Russia 34444 black 1 909 34 0
-Ford America 34444 black 1 2015 200 0
-FordMustang America 1000000 black 0 100
-Audi_R3 Germany 1300000 black 1 10 200 200
-Porche Italy 2000000 red 1 1999 20000 20
-Mercedes Germany 233333 pink 1 1980 20000 20
-Chevrolet America 5656565 black 1 2000 1000 0
+Bugatti Italy 851545 black 0 540
+Lada_5 Russia 12647 blue 1 2010 10000 20
+BMW_i8 Germany 5487225 white 0 200
+Fiat Italy 487515 green 1 2003 0 0
+Ferrari Italy 8766666 black 1 2016 233 0
