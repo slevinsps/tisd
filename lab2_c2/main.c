@@ -476,8 +476,7 @@ void print_time(Car *cars, Car_table *cars_tabl,int size)
     printf("Общий выигрыш в скорости составил %f %%\n",100-((double)(t_mid/kol)/(double)znach1)*100);
     printf("--------------------------------\n");
     printf("Размер таблицы ключей  = %d бит; Размер всей таблицы = %d бит\n",(int)sizeof(Car_table)*size,(int)sizeof(Car)*size);
-    printf("Проигрыш в памяти составил %f %%\n",100 - ((double)sizeof(Car)/(double)(sizeof(Car)+(double)sizeof(Car_table)))* 100);
-    
+    printf("Проигрыш в памяти составил %f %%\n",100 - ((double)sizeof(Car)/(double)(sizeof(Car)+(double)sizeof(Car_table)))* 100); 
 }
     
 
