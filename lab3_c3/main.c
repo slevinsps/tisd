@@ -30,7 +30,7 @@ void print_stack(Stack *stack_arr)
 {
     for (int i = 0; i <= stack_arr->PS - stack_arr->AUB; i++)
     {
-        printf("%c ",*(stack_arr->AUB+i));
+        printf("%c ",*(stack_arr->PS-i));
     }
 }
 
@@ -45,20 +45,11 @@ void print_stack_list(Stack_spisok *head)
 
 void print_sost(Stack_spisok *head)
 {
-    Stack_spisok *tmp = head;
-    printf("                       %p\n", tmp);
     while (head != NULL)
     {
-        printf("%p\n", head);
-        printf("!!!!!! %I64d\n",sizeof(tmp));
-        tmp -= 20;
+        printf("%p       %c\n", head,head->value);
         head = head->next;
-        if (tmp != head)
-        {
-            printf("                       %p\n", tmp);
-        }
     }
-    printf("!!!!!! %I64d\n",sizeof(Stack_spisok));
 }
 
 int push_static_array(Stack *stack_arr, char data)
@@ -104,8 +95,6 @@ int push_dynamic_array(Stack *stack_arr, char data)
     return err;    
 }
 
-
-
 int push_list(Stack_spisok **head, char value) 
 {
     int err = OK;
@@ -138,8 +127,6 @@ int pop_list(Stack_spisok **head,char *value)
     }
     return err;
 }
-
-
 
 int  palindrom_array(Stack *stack_arr, char *s)
 {
@@ -178,7 +165,6 @@ int palindrom_list(Stack_spisok *head, char *s)
         printf("\nСтрока не является палиндромом\n");
     return err;
 }
-
 
 int menu_array(Stack *stack_arr, char *s)
 {
@@ -257,15 +243,10 @@ int menu_array(Stack *stack_arr, char *s)
             //printf("\n%s\n",s);
         }
         if (choice == 0)
-        {
             return 0;
-        }
     }
     return 1;
 }
-
-
-
 
 int menu_list(Stack_spisok **head, char *s)
 {
@@ -278,11 +259,10 @@ int menu_list(Stack_spisok **head, char *s)
     printf("2 - Удалить последний элемент из стэка\n");
     printf("3 - Очистить стэк\n");    
     printf("4 - Проверить на палиндромность\n");
-    printf("5 - Печать элементов стэка\n");
-    printf("6 - Печать текущего состояния стека\n\n");
+    printf("5 - Печать текущего состояния стека\n\n");
     printf("0 - Выйти в главное меню\n");
     printf("Выбор: ");
-    if (scanf("%d",&choice) != 1 || choice > 6 || choice<0)
+    if (scanf("%d",&choice) != 1 || choice > 5 || choice<0)
     {
         printf("Неверный аргумент подменю!");
         fflush(stdin);
@@ -335,27 +315,14 @@ int menu_list(Stack_spisok **head, char *s)
         }
         if (choice == 5)
         {            
-
-            printf("Содержимое стэка\n");
-            if (*head == NULL) 
-                printf("Стэк пуст!\n");
-            else
-                print_stack_list(*head);
-
-        }
-        if (choice == 6)
-        {            
-            printf("Адреса элементов |  Массив свободных областей\n");
+            printf("Адреса элементов |  Элементы\n");
             if (*head == NULL) 
                 printf("Стэк пуст!\n");
             else
                 print_sost(*head);
-
         }
         if (choice == 0)
-        {
             return 0;
-        }
     }
     return 1;
 }
@@ -366,8 +333,6 @@ int menu(char *s)
     int choice;
     int exit = 1;
     Stack stack_arr;
-
-
     printf("\n-----------------------------------------------------\n");
     printf("МЕНЮ\n");
     printf("Вы можете проверить на палиндромность разными способами\n");
@@ -407,8 +372,7 @@ int menu(char *s)
             }    
         }
         if (choice == 2)
-        {
-            
+        {            
             stack_arr.AUB = malloc(5*sizeof(char));
             stack_arr.PS = stack_arr.AUB-1;
             stack_arr.ALB = stack_arr.AUB + MIN_SIZE_STACK;
@@ -426,8 +390,7 @@ int menu(char *s)
             while(exit)
             {
                 exit = menu_array(&stack_arr,s);
-            }
-            
+            }           
         }
         if (choice == 3)
         {
@@ -442,12 +405,8 @@ int menu(char *s)
             }            
         }
         if (choice == 0)
-        {
             return 0;
-        }
     }
-    
-    
     return 1;
 }
 
@@ -457,16 +416,13 @@ int main(void)
     int err = OK;  
     char s[MAX_SIZE_STACK*2];
     for (int i = 0;i<MAX_SIZE_STACK*2;i++)
-    {
         s[i] = 0;
-    }
+    
     setbuf(stdout,NULL);
     printf("Проверка на палиндрость\n");
     printf("Введите строку: ");
-    scanf("%s",s);
+    scanf("%s",s);        
     while(exit)
-    {
-        exit = menu(s);
-    }    
+        exit = menu(s);    
     return err;
 }
