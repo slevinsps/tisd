@@ -9,7 +9,7 @@
 #define STACK_UNDERFLOW -2
 #define MEMORY_ERROR -3
 
-#define MAX_SIZE_STACK 5
+#define MAX_SIZE_STACK 150
 #define MIN_SIZE_STACK 5
 #define MULTIPLY 2
 
@@ -20,10 +20,10 @@ typedef struct Stack {
     int L;
 } Stack;
 
-typedef struct Stack_spisok{
+typedef struct Stack_list{
     char value;
-    struct Stack_spisok *next;
-} Stack_spisok;
+    struct Stack_list *next;
+} Stack_list;
 
 
 void print_stack(Stack *stack_arr)
@@ -34,7 +34,7 @@ void print_stack(Stack *stack_arr)
     }
 }
 
-void print_stack_list(Stack_spisok *head)
+void print_stack_list(Stack_list *head)
 {
     while (head != NULL)
     {
@@ -43,12 +43,23 @@ void print_stack_list(Stack_spisok *head)
     }
 }
 
-void print_sost(Stack_spisok *head)
+void print_sost(Stack_list *head,Stack_list **empty_area,int k)
 {
-    while (head != NULL)
+    if (head == NULL) 
+        printf("стек пуст!\n");
+    else
     {
-        printf("%p       %c\n", head,head->value);
-        head = head->next;
+        printf("Адреса элементов |  Элементы\n");
+        while (head != NULL)
+        {
+            printf("%p       %c\n", head,head->value);
+            head = head->next;
+        }
+    }
+    printf("Адреса свободных областей:\n");
+    for(int i = 0; i < k; i++)
+    {
+        printf("%p\n", empty_area[i]);    
     }
 }
 
@@ -56,10 +67,14 @@ int push_static_array(Stack *stack_arr, char data)
 {
     int err = OK;
     stack_arr->PS += stack_arr->L;
-    if (stack_arr->PS > stack_arr->ALB-1)
+    if (stack_arr->PS > stack_arr->ALB-2)
+    {
         err = STACK_OVERFOW;
-    
-    *(stack_arr->PS) = data;
+        stack_arr->PS -= stack_arr->L;
+    }
+    else        
+        *(stack_arr->PS) = data;
+
     return err;    
 }
 
@@ -70,7 +85,6 @@ int pop_array(Stack *stack_arr, char *value)
     stack_arr->PS -= stack_arr->L;
     if (stack_arr->PS < stack_arr->AUB)
         err = STACK_UNDERFLOW;
-
     return err;    
 }
 
@@ -79,26 +93,33 @@ int push_dynamic_array(Stack *stack_arr, char data)
     int err = OK;
     int size;
     stack_arr->PS += stack_arr->L;
-
+    
     if (stack_arr->PS > stack_arr->ALB-1)
     {
         size = stack_arr->ALB - stack_arr->AUB;
         stack_arr->AUB = realloc(stack_arr->AUB, size * MULTIPLY * sizeof(char));
-        stack_arr->PS = stack_arr->AUB + size;
-        stack_arr->ALB = stack_arr->AUB + size * MULTIPLY;
+        if (stack_arr->AUB)
+        {
+            stack_arr->PS = stack_arr->AUB + size;
+            stack_arr->ALB = stack_arr->AUB + size * MULTIPLY;
+        }
+        else
+            return MEMORY_ERROR;
     }
-    if (stack_arr->PS - stack_arr->AUB + 1> MAX_SIZE_STACK)
+    if (stack_arr->PS - stack_arr->AUB + 2> MAX_SIZE_STACK)
+    {
+        stack_arr->PS -= stack_arr->L;
         err = STACK_OVERFOW;
-
-    *(stack_arr->PS) = data;
-
+    }
+    else
+        *(stack_arr->PS) = data;
     return err;    
 }
 
-int push_list(Stack_spisok **head, char value) 
+int push_list(Stack_list **head, char value) 
 {
     int err = OK;
-    Stack_spisok *tmp = malloc(sizeof(Stack_spisok));
+    Stack_list *tmp = malloc(sizeof(Stack_list));
     if (tmp == NULL) 
         err = MEMORY_ERROR;
     else
@@ -110,9 +131,9 @@ int push_list(Stack_spisok **head, char value)
     return err;
 }
 
-int pop_list(Stack_spisok **head,char *value) 
+int pop_list(Stack_list **head,char *value) 
 {
-    Stack_spisok *last;
+    Stack_list *last;
     int err = OK;
     if (*head == NULL) 
     {
@@ -128,7 +149,7 @@ int pop_list(Stack_spisok **head,char *value)
     return err;
 }
 
-int  palindrom_array(Stack *stack_arr, char *s)
+int palindrom_array(Stack *stack_arr, char *s)
 {
     int k = 1;
     int err = OK;
@@ -146,7 +167,7 @@ int  palindrom_array(Stack *stack_arr, char *s)
     return err;
 }
 
-int palindrom_list(Stack_spisok *head, char *s)
+int palindrom_list(Stack_list *head, char *s)
 {
     int k = 1;
     int err = OK;
@@ -166,21 +187,21 @@ int palindrom_list(Stack_spisok *head, char *s)
     return err;
 }
 
-int menu_array(Stack *stack_arr, char *s)
+int menu_array(Stack *stack_arr, char *s,int r)
 {
     int choice;
     char value; 
     int err = OK;
     printf("\n-----------------------------------------------------\n");
     printf("ПОДМЕНЮ \n");
-    printf("1 - Добавить элемент в стэк\n");
-    printf("2 - Удалить последний элемент из стэка\n");
-    printf("3 - Очистить стэк\n");    
+    printf("1 - Добавить элемент в стек\n");
+    printf("2 - Удалить последний элемент из стека\n");
+    printf("3 - Очистить стек\n");    
     printf("4 - Проверить на палиндромность\n");
-    printf("5 - Печать элементов стэка\n\n");
+    printf("5 - Печать элементов стека\n\n");
     printf("0 - Выйти в главное меню\n");
     printf("Выбор: ");
-    if (scanf("%d",&choice) != 1 || choice > 5 || choice<0)
+    if (scanf("%d",&choice) != 1 || choice > 5 || choice < 0)
     {
         printf("Неверный аргумент подменю!");
         fflush(stdin);
@@ -193,13 +214,22 @@ int menu_array(Stack *stack_arr, char *s)
             char c[1];
             printf("Введите символ: ");
             scanf("%c",c);
-            s[strlen(s)] = c[0];
-            err = push_static_array(stack_arr, c[0]);
+            
+            if (r == 1)
+                err = push_static_array(stack_arr, c[0]);
+            else
+                err = push_dynamic_array(stack_arr, c[0]);
             if (err == STACK_OVERFOW)
             {
-                printf("Стэк переполнен\n");
+                printf("стек переполнен\n");
+            }
+            if (err == MEMORY_ERROR)
+            {
+                printf("ошибка выделения памяти\n");
                 return 0;
             }
+            if (err == OK)
+                s[strlen(s)] = c[0];
         }
         if (choice == 2)
         {
@@ -207,7 +237,7 @@ int menu_array(Stack *stack_arr, char *s)
             s[strlen(s)-1] = 0;
             if(err == STACK_UNDERFLOW)
             {
-                printf("Стэк пуст!\n");
+                printf("стек пуст!\n");
             }
         }
         if (choice == 3)
@@ -217,7 +247,7 @@ int menu_array(Stack *stack_arr, char *s)
                 s[strlen(s)-1] = 0;
             }
             s[strlen(s)-1] = 0;
-            printf("Стэк очищен!\n");
+            printf("стек очищен!\n");
         }
 
         if (choice == 4)
@@ -225,22 +255,19 @@ int menu_array(Stack *stack_arr, char *s)
             palindrom_array(stack_arr, s);
             for (int i = 0; i < strlen(s);i++)
             {
-                err = push_static_array(stack_arr, s[i]);
-                if (err == STACK_OVERFOW)
-                {
-                    printf("Стэк переполнен\n");
-                    return STACK_OVERFOW;
-                }
+                if (r == 1)
+                    err = push_static_array(stack_arr, s[i]);
+                else
+                    err = push_dynamic_array(stack_arr, s[i]);
             }
         }
         if (choice == 5)
         {
-            printf("Содержимое стэка\n");
+            printf("Содержимое стека\n");
             if (stack_arr->PS < stack_arr->AUB)
-                printf("Стэк пуст!\n");
+                printf("стек пуст!\n");
             else
                 print_stack(stack_arr);
-            //printf("\n%s\n",s);
         }
         if (choice == 0)
             return 0;
@@ -248,16 +275,57 @@ int menu_array(Stack *stack_arr, char *s)
     return 1;
 }
 
-int menu_list(Stack_spisok **head, char *s)
+
+int filling_empty_area(Stack_list ***empty_area, Stack_list *head, int *k, int *size)
+{
+    int err = OK;
+    if (*k >= *size)
+    {
+        *empty_area = realloc(*empty_area, *size * MULTIPLY * sizeof(Stack_list *));    
+        *size *= MULTIPLY;
+    }
+    if (*empty_area)
+    {
+        (*empty_area)[*k] = head;
+        (*k)++;
+    }
+    else
+        err = MEMORY_ERROR;
+    return err; 
+}
+
+void delete_empty_area(Stack_list ***empty_area, Stack_list *head, int *k)
+{
+    int n = -1;
+    for (int i = 0;i < *k; i++)
+    {
+        if ((*empty_area)[i] == head)
+        {
+            n = i;
+            break;
+        }
+    }
+    if (n != -1)
+    {   
+        for (int i = n;i < *k-1; i++)
+        {
+            (*empty_area)[i] = (*empty_area)[i+1];
+        }
+        (*k)--;
+    }
+}
+
+
+int menu_list(Stack_list **head, char *s,Stack_list ***empty_area,int *k,int *size_emty_area)
 {
     int choice;
     char value; 
     int err = OK;
     printf("\n-----------------------------------------------------\n");
     printf("ПОДМЕНЮ \n");
-    printf("1 - Добавить элемент в стэк\n");
-    printf("2 - Удалить последний элемент из стэка\n");
-    printf("3 - Очистить стэк\n");    
+    printf("1 - Добавить элемент в стек\n");
+    printf("2 - Удалить последний элемент из стека\n");
+    printf("3 - Очистить стек\n");    
     printf("4 - Проверить на палиндромность\n");
     printf("5 - Печать текущего состояния стека\n\n");
     printf("0 - Выйти в главное меню\n");
@@ -271,36 +339,57 @@ int menu_list(Stack_spisok **head, char *s)
     {
         if (choice == 1)
         {
-            fflush(stdin);
+            fflush(stdin);        
             char c[1];
             printf("Введите символ: ");
             scanf("%c",c);
             s[strlen(s)] = c[0];
             err = push_list(head, c[0]); 
-            print_stack_list(*head);
             if (err == STACK_OVERFOW)
             {
-                printf("Стэк переполнен\n");
-                return 0;
+                printf("стек переполнен\n");
+            }
+            else
+            {
+                delete_empty_area(empty_area, *head, k);                    
             }
         }
         if (choice == 2)
         {
+            Stack_list *tmp = *head;
             err = pop_list(head,&value);
             s[strlen(s)-1] = 0;
             if(err == STACK_UNDERFLOW)
             {
-                printf("Стэк пуст!\n");
+                printf("стек пуст!\n");
+            }
+            else
+            {
+                err = filling_empty_area(empty_area, tmp, k, size_emty_area);
+                if (err == MEMORY_ERROR)
+                {
+                    printf("ошибка выделения памяти\n");
+                    return 0;
+                }
             }
         }
         if (choice == 3)
         {
-            while (pop_list(head,&value) == OK)
+            while (*head != NULL)
             {    
-                s[strlen(s)-1] = 0;
+                err = filling_empty_area(empty_area, *head, k, size_emty_area);
+                if (err == MEMORY_ERROR)
+                {
+                    printf("ошибка выделения памяти\n");
+                    return 0;
+                }
+                else
+                {
+                    pop_list(head,&value);
+                    s[strlen(s)-1] = 0;
+                }    
             }
-            s[strlen(s)-1] = 0;
-            printf("Стэк очищен!\n");
+            printf("стек очищен!\n");
         }
 
         if (choice == 4)
@@ -315,11 +404,7 @@ int menu_list(Stack_spisok **head, char *s)
         }
         if (choice == 5)
         {            
-            printf("Адреса элементов |  Элементы\n");
-            if (*head == NULL) 
-                printf("Стэк пуст!\n");
-            else
-                print_sost(*head);
+            print_sost(*head,*empty_area,*k);
         }
         if (choice == 0)
             return 0;
@@ -327,23 +412,139 @@ int menu_list(Stack_spisok **head, char *s)
     return 1;
 }
 
+
+unsigned long long tick(void)
+{
+    unsigned long long d;
+    __asm__ __volatile__ ("rdtsc" : "=A" (d));
+    return d;
+}
+
+
+void time_memory(void)
+{
+    unsigned long long tb, te;
+    unsigned long long t_mid;
+    unsigned long long t_mid1;
+    unsigned long long t_mid2;
+    unsigned long long t_mid3;
+    //char value;
+    Stack_list *head = NULL;
+    Stack stack_arr;
+    Stack stack_arr2;
+        
+    int k = 100;
+    for (int i = 0; i <= 100; i++)
+    {
+        tb = tick();
+        push_list(&head, 'c');
+        te = tick();
+        if (te >= tb)
+            t_mid = te-tb;
+        else
+            k--;        
+    }
+    printf("Время добавления одного элемента к стеку, реализованному списком: %f\n",(float)t_mid/100);
+
+    k = 100;
+    char arr1[MAX_SIZE_STACK];
+    stack_arr.AUB = arr1;
+    stack_arr.PS = arr1-1;
+    stack_arr.ALB = arr1 + MAX_SIZE_STACK;
+    stack_arr.L = 1;
+    for (int i = 0; i <= 100; i++)
+    {
+        tb = tick();
+        push_static_array(&stack_arr, 'c');
+        te = tick();
+        //printf("%I64d  %I64d\n",te,tb);
+        if (te >= tb)
+            t_mid = te-tb;
+        else
+            k--;        
+    }    
+    printf("Время добавления одного элемента к стеку, реализованному cтатическим массивом: %f\n",(float)t_mid/100);
+    
+    
+    k = 100;
+    stack_arr2.AUB = malloc(MIN_SIZE_STACK*sizeof(char));
+    stack_arr2.PS = stack_arr2.AUB-1;
+    stack_arr2.ALB = stack_arr2.AUB + MIN_SIZE_STACK;
+    stack_arr2.L = 1;
+    for (int i = 0; i <= 100; i++)
+    {
+        tb = tick();
+        push_dynamic_array(&stack_arr2, 'c');
+        te = tick();
+        //printf("%I64d  %I64d\n",te,tb);
+        if (te >= tb)
+            t_mid = te-tb;
+        else
+            k--;        
+    } 
+    printf("Время добавления одного элемента к стеку, реализованному динамическим массивом: %f\n",(float)t_mid/100);
+    
+    printf("\n-----------------------------------------------------\n"); 
+    char value;
+    tb = tick();      
+    while (head != NULL)
+    {    
+        pop_list(&head,&value);  
+    }
+    te = tick();
+    t_mid = te-tb;
+    t_mid1 = t_mid / 100;
+    printf("Время очистки стека, реализованного списком: %f\n",(float)t_mid);
+
+    
+    tb = tick(); 
+    while (pop_array(&stack_arr,&value)  == OK)
+    {    
+        ;
+    }
+    te = tick();
+    t_mid = te-tb;
+    t_mid2 = t_mid / 100;
+    printf("Время очистки стека, реализованного статическим массивом: %f\n",(float)t_mid);
+    
+    tb = tick();
+    while (pop_array(&stack_arr2,&value)  == OK)
+    {    
+        ;
+    }
+    te = tick();
+    t_mid = te-tb;
+    t_mid3 = t_mid / 100;
+    printf("Время очистки стека, реализованного динамическим массивом: %f\n",(float)t_mid);
+
+    printf("\n-----------------------------------------------------\n");
+    printf("Время удаления одного элемента из стека, реализованному списком: %f\n",(float)t_mid1);
+    printf("Время удаления одного элемента из стека, реализованному статическим массивом: %f\n",(float)t_mid2);
+    printf("Время удаления одного элемента из стека, реализованному динамическим массивом: %f\n",(float)t_mid3);
+    printf("\n-----------------------------------------------------\n");
+    printf("Объем памяти, которое занимает 100 элементов стека реализованного списком: %I64d\n", sizeof(Stack_list)*100);
+    printf("Объем памяти, которое занимает 100 элементов стека реализованного статическим массивом: %I64d\n", sizeof(char)*100);
+    printf("Объем памяти, которое занимает 100 элементов стека реализованного динамическим массивом: %I64d\n", sizeof(char)*100);
+}
 int menu(char *s)
 {
     int err = OK;
     int choice;
     int exit = 1;
     Stack stack_arr;
+    Stack_list *head = NULL;
     printf("\n-----------------------------------------------------\n");
     printf("МЕНЮ\n");
     printf("Вы можете проверить на палиндромность разными способами\n");
-    printf("в зависимости от того, как вы зададите стэк\n");
-    printf("1 - Задать стэк с помощью статического массива\n");
-    printf("2 - Задать стэк с помощью динамического массива\n");
-    printf("3 - Задать стэк с помощью односвязного списка\n");
+    printf("в зависимости от того, как вы зададите стек\n");
+    printf("1 - Задать стек с помощью статического массива\n");
+    printf("2 - Задать стек с помощью динамического массива\n");
+    printf("3 - Задать стек с помощью односвязного списка\n");
+    printf("4 - Вывести вряемя работы и занимаемую память\n");
       
     printf("0 - Выйти\n");
     printf("Выбор: ");
-    if (scanf("%d",&choice) != 1 || choice>3 || choice<0)
+    if (scanf("%d",&choice) != 1 || choice>4 || choice<0)
     {
         printf("Неверный аргумент меню!");
         fflush(stdin);
@@ -362,47 +563,55 @@ int menu(char *s)
                 err = push_static_array(&stack_arr, s[i]);
                 if (err == STACK_OVERFOW)
                 {
-                    printf("Стэк переполнен\n");
-                    return STACK_OVERFOW;
+                    printf("стек переполнен\n");
+                    return 0;
                 }
             }
             while(exit)
             {
-                exit = menu_array(&stack_arr,s);
+                exit = menu_array(&stack_arr,s,1);
             }    
         }
         if (choice == 2)
         {            
-            stack_arr.AUB = malloc(5*sizeof(char));
+            stack_arr.AUB = malloc(MIN_SIZE_STACK*sizeof(char));
             stack_arr.PS = stack_arr.AUB-1;
             stack_arr.ALB = stack_arr.AUB + MIN_SIZE_STACK;
             stack_arr.L = 1;
             
             for (int i = 0; i < strlen(s);i++)
             {
-                err = push_static_array(&stack_arr, s[i]);
+                err = push_dynamic_array(&stack_arr, s[i]);
                 if (err == STACK_OVERFOW)
                 {
-                    printf("Стэк переполнен\n");
-                    return STACK_OVERFOW;
+                    printf("стек переполнен\n");
+                    return 0;
                 }
             }
             while(exit)
             {
-                exit = menu_array(&stack_arr,s);
+                exit = menu_array(&stack_arr,s,2);
             }           
         }
         if (choice == 3)
         {
-            Stack_spisok *head = NULL;
+            
             for (int i = 0; i < strlen(s);i++)
             {
                 push_list(&head, s[i]);                
             }
+            int k = 0;
+            int size_emty_area = MIN_SIZE_STACK;
+            Stack_list **empty_area = malloc(size_emty_area*sizeof(Stack_list *));
             while(exit)
             {
-                exit = menu_list(&head, s);
+                exit = menu_list(&head, s,&empty_area,&k, &size_emty_area);
             }            
+        }
+        if (choice == 4)
+        {            
+            srand(time(NULL));
+            time_memory();           
         }
         if (choice == 0)
             return 0;
@@ -419,8 +628,8 @@ int main(void)
         s[i] = 0;
     
     setbuf(stdout,NULL);
-    printf("Проверка на палиндрость\n");
-    printf("Введите строку: ");
+    printf("Проверка на палиндромность\n");
+    printf("Введите строку(максимальная длина %d): ",MAX_SIZE_STACK);
     scanf("%s",s);        
     while(exit)
         exit = menu(s);    
