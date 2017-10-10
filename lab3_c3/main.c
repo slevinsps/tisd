@@ -9,7 +9,7 @@
 #define STACK_UNDERFLOW -2
 #define MEMORY_ERROR -3
 
-#define MAX_SIZE_STACK 150
+#define MAX_SIZE_STACK 6
 #define MIN_SIZE_STACK 5
 #define MULTIPLY 2
 
@@ -231,16 +231,21 @@ int menu_array(Stack *stack_arr, char *s,int r)
         }
         if (choice == 3)
         {
-            while (pop_array(stack_arr,&value)  == OK)
+            if (r == 1)
+				stack_arr->PS = stack_arr->AUB - 1;
+			for (int i = 0;i < strlen(s);i++)
             {    
-                s[strlen(s)-1] = 0;
+                s[i] = 0;
             }
-            s[strlen(s)-1] = 0;
+            printf("%s\n",s);
             printf("стек очищен!\n");
         }
 
         if (choice == 4)
         {
+			printf("%s \n",s);
+			printf("%s \n",stack_arr->AUB);
+			
             int tmp = palindrom_array(stack_arr, s);
 			if (tmp)
 				printf("Строка является палиндромом\n");
@@ -430,165 +435,173 @@ void time_memory(void)
     Stack stack_arr;
     Stack stack_arr2;
         
-    int k = 100;
-    for (int i = 0; i < 100; i++)
-    {
-        tb = tick();
-        push_list(&head, 'c');
-        te = tick();
-        if (te >= tb)
-            t_mid = te-tb;
-        else
-            k--;        
-    }
-    printf("Время добавления одного элемента к стеку, реализованному списком: %f\n",(float)t_mid/100);
-
-    k = 100;
-    char arr1[MAX_SIZE_STACK];
-    stack_arr.AUB = arr1;
-    stack_arr.PS = arr1-1;
-    stack_arr.ALB = arr1 + MAX_SIZE_STACK;
-    stack_arr.L = 1;
-    for (int i = 0; i < 100; i++)
-    {
-        tb = tick();
-        push_static_array(&stack_arr, 'c');
-        te = tick();
-        //printf("%I64d  %I64d\n",te,tb);
-        if (te >= tb)
-            t_mid = te-tb;
-        else
-            k--;        
-    }    
-    printf("Время добавления одного элемента к стеку, реализованному cтатическим массивом: %f\n",(float)t_mid/100);
-    
-    
-    k = 100;
-    stack_arr2.AUB = malloc(MIN_SIZE_STACK*sizeof(char));
-    stack_arr2.PS = stack_arr2.AUB-1;
-    stack_arr2.ALB = stack_arr2.AUB + MIN_SIZE_STACK;
-    stack_arr2.L = 1;
-    for (int i = 0; i < 100; i++)
-    {
-        tb = tick();
-        push_dynamic_array(&stack_arr2, 'c');
-        te = tick();
-        //printf("%I64d  %I64d\n",te,tb);
-        if (te >= tb)
-            t_mid = te-tb;
-        else
-            k--;        
-    } 
-    printf("Время добавления одного элемента к стеку, реализованному динамическим массивом: %f\n",(float)t_mid/100);
-    
-    printf("\n-----------------------------------------------------\n"); 
-	
-	
-	
-	char s[100];
-	for (int i = 0; i<100; i++)
-		s[i] = 'c';
-	
-	
-	
-	for (int i = 0; i < 100; i++)
-    {
-        tb = tick();
-        palindrom_array(&stack_arr, s);
-        te = tick();
-		head = NULL;
-        for (int i = 0; i < strlen(s);i++)
+    int k = 20;
+	for (int i = 0;i<3;i++)
+	{
+		int n = k;
+		printf("Количество элементов = %d\n",k);
+		for (int i = 0; i < n; i++)
 		{
-			push_static_array(&stack_arr, s[i]);
+			tb = tick();
+			push_list(&head, 'c');
+			te = tick();
+			if (te >= tb)
+				t_mid = te-tb;
+			else
+				n--;        
 		}
-        if (te >= tb)
-            t_mid = te-tb;
-        else
-            k--;        
-    } 
-	printf("Время работы функции, стек, реализован статическим массивом: %f\n",(float)t_mid/100);
+		printf("Время добавления одного элемента к стеку, реализованному списком: %f\n",(float)t_mid/n);
 	
-	for (int i = 0; i < 100; i++)
-    {
-        tb = tick();
-        palindrom_array(&stack_arr2, s);
-        te = tick();
-		head = NULL;
-        for (int i = 0; i < strlen(s);i++)
+		n = k;
+		char arr1[MAX_SIZE_STACK];
+		stack_arr.AUB = arr1;
+		stack_arr.PS = arr1-1;
+		stack_arr.ALB = arr1 + MAX_SIZE_STACK;
+		stack_arr.L = 1;
+		for (int i = 0; i < n; i++)
+		{
+			tb = tick();
+			push_static_array(&stack_arr, 'c');
+			te = tick();
+			//printf("%I64d  %I64d\n",te,tb);
+			if (te >= tb)
+				t_mid = te-tb;
+			else
+				n--;        
+		}    
+		printf("Время добавления одного элемента к стеку, реализованному cтатическим массивом: %f\n",(float)t_mid/n);
+		
+		
+		n = k;
+		stack_arr2.AUB = malloc(MIN_SIZE_STACK*sizeof(char));
+		stack_arr2.PS = stack_arr2.AUB-1;
+		stack_arr2.ALB = stack_arr2.AUB + MIN_SIZE_STACK;
+		stack_arr2.L = 1;
+		for (int i = 0; i < n; i++)
+		{
+			tb = tick();
+			push_dynamic_array(&stack_arr2, 'c');
+			te = tick();
+			//printf("%I64d  %I64d\n",te,tb);
+			if (te >= tb)
+				t_mid = te-tb;
+			else
+				n--;        
+		} 
+		printf("Время добавления одного элемента к стеку, реализованному динамическим массивом: %f\n",(float)t_mid/n);
+		
+		printf("-----------------------------------------------------\n"); 
+		
+	
+	
+		n = k;
+		char s[n];
+		for (int i = 0; i<n; i++)
+			s[i] = 'c';
+		
+		
+		
+		for (int i = 0; i < n; i++)
+		{
+			tb = tick();
+			palindrom_array(&stack_arr, s);
+			te = tick();
+			head = NULL;
+			for (int i = 0; i < strlen(s);i++)
+			{
+				push_static_array(&stack_arr, s[i]);
+			}
+			if (te >= tb)
+				t_mid = te-tb;
+			else
+				n--;        
+		} 
+		printf("Время работы функции, стек, реализован статическим массивом: %f\n",(float)t_mid/n);
+		n = k;
+		for (int i = 0; i < n; i++)
+		{
+			tb = tick();
+			palindrom_array(&stack_arr2, s);
+			te = tick();
+			head = NULL;
+			for (int i = 0; i < strlen(s);i++)
+			{
+				push_dynamic_array(&stack_arr2, s[i]);
+			}
+			if (te >= tb)
+				t_mid = te-tb;
+			else
+				n--;        
+		}
+		printf("Время работы функции, стек, реализован динамическим массивом: %f\n",(float)t_mid/n);
+		n = k;
+		for (int i = 0; i < n; i++)
+		{
+			tb = tick();
+			palindrom_list(head, s);
+			te = tick();
+			head = NULL;
+			for (int i = 0; i < strlen(s);i++)
+			{
+				push_list(&head, s[i]);                
+			}
+			if (te >= tb)
+				t_mid = te-tb;
+			else
+				n--;        
+		} 
+		printf("Время работы функции, стек, реализован списком: %f\n",(float)t_mid/n);
+		
+		n = k;
+		printf("-----------------------------------------------------\n"); 
+		char value;
+		tb = tick();      
+		while (head != NULL)
+		{    
+			pop_list(&head,&value);  
+		}
+		te = tick();
+		t_mid = te-tb;
+		t_mid1 = t_mid / n;
+		printf("Время очистки стека, реализованного списком: %f\n",(float)t_mid);
+	
+		
+		tb = tick(); 
+		while (pop_array(&stack_arr,&value)  == OK)
+		{    
+			;
+		}
+		te = tick();
+		t_mid = te-tb;
+		t_mid2 = t_mid / n;
+		printf("Время очистки стека, реализованного статическим массивом: %f\n",(float)t_mid);
+		
+		tb = tick();
+		while (pop_array(&stack_arr2,&value)  == OK)
+		{    
+			;
+		}
+		te = tick();
+		t_mid = te-tb;
+		t_mid3 = t_mid / n;
+		printf("Время очистки стека, реализованного динамическим массивом: %f\n",(float)t_mid);
+	
+		for (int i = 0; i < n;i++)
 		{
 			push_dynamic_array(&stack_arr2, s[i]);
 		}
-        if (te >= tb)
-            t_mid = te-tb;
-        else
-            k--;        
-    } 
-	printf("Время работы функции, стек, реализован динамическим массивом: %f\n",(float)t_mid/100);
-	
-	for (int i = 0; i < 100; i++)
-    {
-        tb = tick();
-        palindrom_list(head, s);
-        te = tick();
-		head = NULL;
-        for (int i = 0; i < strlen(s);i++)
-        {
-            push_list(&head, s[i]);                
-        }
-        if (te >= tb)
-            t_mid = te-tb;
-        else
-            k--;        
-    } 
-	printf("Время работы функции, стек, реализован списком: %f\n",(float)t_mid/100);
-	
-	
-	printf("\n-----------------------------------------------------\n"); 
-    char value;
-    tb = tick();      
-    while (head != NULL)
-    {    
-        pop_list(&head,&value);  
-    }
-    te = tick();
-    t_mid = te-tb;
-    t_mid1 = t_mid / 100;
-    printf("Время очистки стека, реализованного списком: %f\n",(float)t_mid);
-
-    
-	tb = tick(); 
-    while (pop_array(&stack_arr,&value)  == OK)
-    {    
-        ;
-    }
-    te = tick();
-    t_mid = te-tb;
-    t_mid2 = t_mid / 100;
-    printf("Время очистки стека, реализованного статическим массивом: %f\n",(float)t_mid);
-    
-    tb = tick();
-    while (pop_array(&stack_arr2,&value)  == OK)
-    {    
-        ;
-    }
-    te = tick();
-    t_mid = te-tb;
-    t_mid3 = t_mid / 100;
-    printf("Время очистки стека, реализованного динамическим массивом: %f\n",(float)t_mid);
-
-	for (int i = 0; i < strlen(s);i++)
-	{
-		push_dynamic_array(&stack_arr2, s[i]);
+		n = k;
+		printf("-----------------------------------------------------\n");
+		printf("Время удаления одного элемента из стека, реализованному списком: %f\n",(float)t_mid1);
+		printf("Время удаления одного элемента из стека, реализованному статическим массивом: %f\n",(float)t_mid2);
+		printf("Время удаления одного элемента из стека, реализованному динамическим массивом: %f\n",(float)t_mid3);
+		printf("-----------------------------------------------------\n");
+		printf("Объем памяти, которое занимает %d элементов стека реализованного списком: %I64d\n", k, sizeof(Stack_list)*k);
+		printf("Объем памяти, которое занимает %d элементов стека реализованного статическим массивом: %I64d\n", k, sizeof(Stack)*k);
+		printf("Объем памяти, которое занимает %d элементов стека реализованного динамическим массивом: %I64d\n", k, sizeof(Stack)*(stack_arr2.ALB - stack_arr2.AUB));
+		k += 20;
+		printf("\n\n################################\n");
 	}
-	
-    printf("\n-----------------------------------------------------\n");
-    printf("Время удаления одного элемента из стека, реализованному списком: %f\n",(float)t_mid1);
-    printf("Время удаления одного элемента из стека, реализованному статическим массивом: %f\n",(float)t_mid2);
-    printf("Время удаления одного элемента из стека, реализованному динамическим массивом: %f\n",(float)t_mid3);
-    printf("\n-----------------------------------------------------\n");
-    printf("Объем памяти, которое занимает 100 элементов стека реализованного списком: %I64d\n", sizeof(Stack_list)*100);
-    printf("Объем памяти, которое занимает 100 элементов стека реализованного статическим массивом: %I64d\n", sizeof(Stack)*100);
-    printf("Объем памяти, которое занимает 100 элементов стека реализованного динамическим массивом: %I64d\n", sizeof(Stack)*(stack_arr2.ALB - stack_arr2.AUB));
 }
 int menu(char *s)
 {
