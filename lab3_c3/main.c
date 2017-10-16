@@ -191,7 +191,6 @@ int palindrom_list(Stack_list *head, char *s)
 {
     int k = 1;
     char value;
-    
     for (int i = 0; i < strlen(s);i++)
     {
         pop_list(&head,&value);
@@ -289,17 +288,22 @@ int menu_array(Stack *stack_arr, char *s,int r, int *size_array)
 
         if (choice == 4)
         {    
-            int tmp = palindrom_array(stack_arr, s);
-            if (tmp)
-                printf("Строка является палиндромом\n");
+            if (strlen(s) == 0)
+                printf("стек пуст!\n");
             else
-                printf("Строка не является палиндромом\n");
-            for (int i = 0; i < strlen(s);i++)
             {
-                if (r == 1)
-                    err = push_static_array(stack_arr, s[i]);
+                int tmp = palindrom_array(stack_arr, s);
+                if (tmp)
+                    printf("Строка является палиндромом\n");
                 else
-                    err = push_dynamic_array(stack_arr, s[i],size_array);
+                    printf("Строка не является палиндромом\n");
+                for (int i = 0; i < strlen(s);i++)
+                {
+                    if (r == 1)
+                        err = push_static_array(stack_arr, s[i]);
+                    else
+                        err = push_dynamic_array(stack_arr, s[i],size_array);
+                }
             }
         }
         if (choice == 5)
@@ -435,16 +439,21 @@ int menu_list(Stack_list **head, char *s,Stack_list ***empty_area,int *k,int *si
 
         if (choice == 4)
         {
-            int tmp;
-            tmp = palindrom_list(*head, s);
-            if (tmp)
-                printf("Строка является палиндромом\n");
+            if (strlen(s) == 0)
+                printf("стек пуст!\n");
             else
-                printf("Строка не является палиндромом\n");
-            *head = NULL;
-            for (int i = 0; i < strlen(s);i++)
             {
-                push_list(head, s[i]);                
+                int tmp;
+                tmp = palindrom_list(*head, s);
+                if (tmp)
+                    printf("Строка является палиндромом\n");
+                else
+                    printf("Строка не является палиндромом\n");
+                *head = NULL;
+                for (int i = 0; i < strlen(s);i++)
+                {
+                    push_list(head, s[i]);                
+                }   
             }    
         }
         if (choice == 5)
