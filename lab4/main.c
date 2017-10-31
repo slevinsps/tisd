@@ -108,7 +108,6 @@ int pop_list(Queue_list *list)
 
 void create_time(double *time_come,double *time_work, double t1, double t2, double t3, double t4)
 {
-	//t1 + (t2 - t1) * (double)rand() / (double)40
 	double tmp;
 	tmp = *time_come;
 	*time_come = t1 + (t2 - t1) * (double)rand() / (double)RAND_MAX;
@@ -135,7 +134,6 @@ int modelling_system_list(Queue_list *queue_1, Queue_list *queue_2)
 
 	double real_time = -1;
 	double time_prost1 = 0;
-	double time_prost2 = 0;
 	double time_obrab1 = 0;
 	double time_obrab2 = 0;
 	int count_applications_enter1 = 0;
@@ -279,21 +277,19 @@ int modelling_system_list(Queue_list *queue_1, Queue_list *queue_2)
 				printf("Средняя длина первой очереди = %f\n",(float)count_queue1_sr/counter_loop);
 				printf("Средняя длина второй очереди = %f\n",(float)count_queue2_sr/counter_loop);
 				printf("Количество вошедших и вышедших заявок в первой очереди: %d; %d\n",count_applications_enter1, count_applications_exit1);
-	            printf("Количество вошедших и вышедших заявок в первой очереди: %d; %d\n",count_applications_enter2, count_applications_exit2);
+	            printf("Количество вошедших и вышедших заявок во второй очереди: %d; %d\n",count_applications_enter2, count_applications_exit2);
 	            printf("Среднее время пребывания в первой очереди = %f\n",(float)sr_time_in_queue1/count_applications_exit1);
 	            printf("Среднее время пребывания во второй очереди = %f\n",(float)sr_time_in_queue2/count_applications_exit2);
 			}
 			
 		}
 	}
-	time_prost1 = time_obrab1 - time_come1;
-	time_prost2 = time_obrab2 - time_come2;
+	time_prost1 = real_time - (time_obrab1 + time_obrab2);
 	printf("\nВремя моделирования = %f\n",real_time);
-	printf("Время простоя первой очереди = %f\n",time_prost1);
-	printf("Время простоя второй очереди = %f\n",time_prost2);
+	printf("Время простоя OA = %f\n",time_prost1);
 	printf("Количество вошедших и вышедших заявок в первой очереди: %d; %d\n",count_applications_enter1, count_applications_exit1);
-	printf("Количество вошедших и вышедших заявок в первой очереди: %d; %d\n",count_applications_enter2, count_applications_exit2);
-	printf("Аппарат сработал: %d раз\n",count_applications_enter1 + count_applications_enter2);
+	printf("Количество вошедших и вышедших заявок во второй очереди: %d; %d\n",count_applications_enter2, count_applications_exit2);
+	printf("Аппарат сработал: %d раз\n",count_applications_exit1 + count_applications_exit2);
 	printf("Время работы ОА для первой очереди составило: %f\n",(float)count_applications_enter1*(4/2));
 	printf("Время работы ОА для второй очереди составило: %f\n",count_applications_enter2*(0.5));
 	double zayav = real_time / ((1+5)/2);
@@ -317,7 +313,6 @@ int modelling_system_arr(Arr_q *queue_1, Arr_q *queue_2)
 
 	double real_time = -1;
 	double time_prost1 = 0;
-	double time_prost2 = 0;
 	double time_obrab1 = 0;
 	double time_obrab2 = 0;
 	int count_applications_enter1 = 0;
@@ -336,11 +331,11 @@ int modelling_system_arr(Arr_q *queue_1, Arr_q *queue_2)
 	{
 		if (real_time < 0)
 		{
-			create_time(&time_come1,&time_work1, 1, 5, 0, 4);	
+			create_time(&time_come1,&time_work1, 1, 9, 0, 4);	
 			time_obrab1 += time_work1;
 			push_Queue_arr(queue_1, time_work1, time_come1);
 			count_queue1++;
-			create_time(&time_come2,&time_work2, 0, 3, 0, 1);
+			create_time(&time_come2,&time_work2, 0, 4, 0, 1);
 			push_Queue_arr(queue_2, time_work2, time_come2);
 			count_queue2++;
 			time_obrab2 += time_work2;
@@ -354,7 +349,7 @@ int modelling_system_arr(Arr_q *queue_1, Arr_q *queue_2)
 			{
 				if (queue_1->Pout->time_come > queue_2->Pout->time_come)
 				{
-					create_time(&time_come2,&time_work2, 0, 3, 0, 1);
+					create_time(&time_come2,&time_work2, 0, 4, 0, 1);
 			        push_Queue_arr(queue_2, time_work2, time_come2);
 				
 			        time_obrab2 += time_work2;
@@ -366,7 +361,7 @@ int modelling_system_arr(Arr_q *queue_1, Arr_q *queue_2)
 				}
 				else
 				{
-					create_time(&time_come1,&time_work1, 1, 5, 0, 4);
+					create_time(&time_come1,&time_work1, 1, 9, 0, 4);
 			        push_Queue_arr(queue_1, time_work1, time_come1);
 					time_obrab1 += time_work1;
 					count_applications_enter1++;
@@ -384,7 +379,7 @@ int modelling_system_arr(Arr_q *queue_1, Arr_q *queue_2)
 				sr_time_in_queue2 += (real_time - queue_2->Pout->time_come);
 				while (time_come2 <= real_time)
 				{
-					create_time(&time_come2,&time_work2, 0, 3, 0, 1);
+					create_time(&time_come2,&time_work2, 0, 4, 0, 1);
 			        push_Queue_arr(queue_2, time_work2, time_come2);
 					count_queue2++;
 					time_obrab2 += time_work2;
@@ -403,7 +398,7 @@ int modelling_system_arr(Arr_q *queue_1, Arr_q *queue_2)
 				sr_time_in_queue1 += (real_time - queue_1->Pout->time_come);
 				while (time_come1 <= real_time)
 				{
-					create_time(&time_come1,&time_work1, 1, 5, 0, 4);
+					create_time(&time_come1,&time_work1, 1, 9, 0, 4);
 			        push_Queue_arr(queue_1, time_work1, time_come1);
 					count_queue1++;	
 					time_obrab1 += time_work1;
@@ -426,7 +421,7 @@ int modelling_system_arr(Arr_q *queue_1, Arr_q *queue_2)
 				sr_time_in_queue2 += (real_time - queue_2->Pout->time_come);
 				while (time_come1 <= real_time)
 				{
-					create_time(&time_come1,&time_work1, 1, 5, 0, 4);
+					create_time(&time_come1,&time_work1, 1, 9, 0, 4);
 			        push_Queue_arr(queue_1, time_work1, time_come1);
 					count_queue1++;	
 					time_obrab1 += time_work1;
@@ -434,7 +429,7 @@ int modelling_system_arr(Arr_q *queue_1, Arr_q *queue_2)
 				}
 				while (time_come2 <= real_time)
 				{
-					create_time(&time_come2,&time_work2, 0, 3, 0, 1);
+					create_time(&time_come2,&time_work2, 0, 4, 0, 1);
 			        push_Queue_arr(queue_2, time_work2, time_come2);
 					count_queue2++;	
 					time_obrab2 += time_work2;
@@ -468,17 +463,15 @@ int modelling_system_arr(Arr_q *queue_1, Arr_q *queue_2)
 			
 		}
 	}
-	time_prost1 = time_obrab1 - time_come1;
-	time_prost2 = time_obrab2 - time_come2;
+	time_prost1 = real_time - (time_obrab1 + time_obrab2);
 	printf("\nВремя моделирования = %f\n",real_time);
-	printf("Время простоя первой очереди = %f\n",time_prost1);
-	printf("Время простоя второй очереди = %f\n",time_prost2);
+	printf("Время простоя OA = %f\n",time_prost1);
 	printf("Количество вошедших и вышедших заявок в первой очереди: %d; %d\n",count_applications_enter1, count_applications_exit1);
 	printf("Количество вошедших и вышедших заявок в первой очереди: %d; %d\n",count_applications_enter2, count_applications_exit2);
 	printf("Аппарат сработал: %d раз\n",count_applications_enter1 + count_applications_enter2);
 	printf("Время работы ОА для первой очереди составило: %f\n",(float)count_applications_enter1*(4/2));
 	printf("Время работы ОА для второй очереди составило: %f\n",count_applications_enter2*(0.5));
-	double zayav = real_time / ((1+5)/2);
+	double zayav = real_time / ((1+9)/2);
 	printf("Погрешность =  %f%%\n",100*(fabs(zayav - count_applications_enter1)/zayav));
 
 	return 0;
