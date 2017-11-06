@@ -380,8 +380,10 @@ int modelling_system_list(Queue_list *queue_1, Queue_list *queue_2, List_q ***em
                 printf("Средняя длина второй очереди = %f\n",(double)count_queue2_sr/counter_loop);
                 printf("Количество вошедших и вышедших заявок в первой очереди: %d; %d\n",count_applications_enter1, count_applications_exit1);
                 printf("Количество вошедших и вышедших заявок во второй очереди: %d; %d\n",count_applications_enter2, count_applications_exit2);
-                printf("Среднее время пребывания в первой очереди = %f\n",(double)sr_time_in_queue1/count_applications_exit1);
-                printf("Среднее время пребывания во второй очереди = %f\n",(double)sr_time_in_queue2/count_applications_exit2);
+				if (count_applications_exit1 > 0)
+					printf("Среднее время пребывания в первой очереди = %f\n",(double)sr_time_in_queue1/count_applications_exit1);
+				if (count_applications_exit2 > 0)
+					printf("Среднее время пребывания во второй очереди = %f\n",(double)sr_time_in_queue2/count_applications_exit2);
             }    
         }
     }
@@ -419,7 +421,10 @@ int modelling_system_list(Queue_list *queue_1, Queue_list *queue_2, List_q ***em
                 printf("Такого пункта меню нет\n");
         }
         else
+		{
             printf("Некорректный пункт меню\n");
+			fflush(stdin);
+		}
     } 
     
     return 0;
@@ -591,8 +596,10 @@ int modelling_system_arr(Arr_q *queue_1, Arr_q *queue_2, int *t_all1, int *t_all
                 printf("Средняя длина второй очереди = %f\n",(double)count_queue2_sr/counter_loop);
                 printf("Количество вошедших и вышедших заявок в первой очереди: %d; %d\n",count_applications_enter1, count_applications_exit1);
                 printf("Количество вошедших и вышедших заявок во второй очереди: %d; %d\n",count_applications_enter2, count_applications_exit2);
-                printf("Среднее время пребывания в первой очереди = %f\n",(double)sr_time_in_queue1/count_applications_exit1);
-                printf("Среднее время пребывания во второй очереди = %f\n",(double)sr_time_in_queue2/count_applications_exit2);
+                if (count_applications_exit1 > 0)
+					printf("Среднее время пребывания в первой очереди = %f\n",(double)sr_time_in_queue1/count_applications_exit1);
+				if (count_applications_exit2 > 0)
+					printf("Среднее время пребывания во второй очереди = %f\n",(double)sr_time_in_queue2/count_applications_exit2);
             }
         }
     }
@@ -774,13 +781,13 @@ int main(void)
     int t2[4];
     printf("Введите границы интервала времени прихода и работы первой очереди:\n");
     printf("tc11 tc12 tw11 tw12 = ");
-    if (scanf("%d %d %d %d",&t1[0], &t1[1], &t1[2], &t1[3]) != 4)
+    if (scanf("%d %d %d %d",&t1[0], &t1[1], &t1[2], &t1[3]) != 4 || t1[1]-t1[0] <= 0 || t1[3]-t1[2] <= 0)
     {
         printf("Некорректные границы");
         return -1;
     }
     printf("tc21 tc22 tw21 tw22 = ");
-    if (scanf("%d %d %d %d",&t2[0], &t2[1], &t2[2], &t2[3]) != 4)
+    if (scanf("%d %d %d %d",&t2[0], &t2[1], &t2[2], &t2[3]) != 4 || t2[1]-t2[0] <= 0 || t2[3]-t2[2] <= 0)
     {
         printf("Некорректные границы");
         return -1;
@@ -794,44 +801,51 @@ int main(void)
         printf("3 - вывести информацию о времени и памяти\n\n");
         printf("0 - выход\n");
         printf("Введите пункт меню: ");
-        scanf("%d",&choose);
-        if (choose == 1)
-        {
-            int k = 0;
-            int size_emty_area = 5;
-            List_q **empty_area = malloc(size_emty_area*sizeof(Queue_list *));
-
-            modelling_system_list(&q_list_1, &q_list_2, &empty_area, &k, &size_emty_area, t1, t2);
-            while (pop_list(&q_list_1) == OK)
-            {
-            }
-            while (pop_list(&q_list_1) == OK)
-            {
-            }
-            q_list_1.Pin = NULL;
-            q_list_1.Pout = NULL;
-            
-            q_list_2.Pin = NULL;
-            q_list_2.Pout = NULL;
-        }
-        else if (choose == 2)
-        {
-            modelling_system_arr(&q_arr_1, &q_arr_2, t1, t2);
-            q_arr_1.Pin = q_arr_11;
-            q_arr_1.Pout = q_arr_11;
-            q_arr_1.end = q_arr_11 + MAX_SIZE_QUEUE-1;
-            q_arr_2.Pin = q_arr_22;
-            q_arr_2.Pout = q_arr_22;
-            q_arr_2.end = q_arr_22 + MAX_SIZE_QUEUE-1;
-        }
-        else if (choose == 3)
-        {
-            time_memory();
-        }
-        else if (choose == 0)
-            break;
-        else
-            printf("Такого пункта меню нет\n");
+        if (scanf("%d",&choose) == 1)
+		{
+			if (choose == 1)
+			{
+				int k = 0;
+				int size_emty_area = 5;
+				List_q **empty_area = malloc(size_emty_area*sizeof(Queue_list *));
+	
+				modelling_system_list(&q_list_1, &q_list_2, &empty_area, &k, &size_emty_area, t1, t2);
+				while (pop_list(&q_list_1) == OK)
+				{
+				}
+				while (pop_list(&q_list_1) == OK)
+				{
+				}
+				q_list_1.Pin = NULL;
+				q_list_1.Pout = NULL;
+				
+				q_list_2.Pin = NULL;
+				q_list_2.Pout = NULL;
+			}
+			else if (choose == 2)
+			{
+				modelling_system_arr(&q_arr_1, &q_arr_2, t1, t2);
+				q_arr_1.Pin = q_arr_11;
+				q_arr_1.Pout = q_arr_11;
+				q_arr_1.end = q_arr_11 + MAX_SIZE_QUEUE-1;
+				q_arr_2.Pin = q_arr_22;
+				q_arr_2.Pout = q_arr_22;
+				q_arr_2.end = q_arr_22 + MAX_SIZE_QUEUE-1;
+			}
+			else if (choose == 3)
+			{
+				time_memory();
+			}
+			else if (choose == 0)
+				break;
+			else
+				printf("Такого пункта меню нет\n");
+		}
+		else
+		{
+			printf("Некорректный пункт меню\n");
+			fflush(stdin);
+		}
     }
 
 }
