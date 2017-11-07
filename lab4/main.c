@@ -115,12 +115,10 @@ int pop_list(Queue_list *list)
 }
 
 
-void create_time(double *time_come,double *time_work, double t1, double t2, double t3, double t4)
+void create_time(double *time_come,double *time_work, double t1, double t2, double t3, double t4, double real_time)
 {
-    double tmp;
-    tmp = *time_come;
     *time_come = t1 + (t2 - t1) * (double)rand() / (double)RAND_MAX;
-    *time_come += tmp;
+    *time_come += real_time;
     *time_work = t3 + (t4 - t3) * (double)rand() / (double)RAND_MAX;
 }
 
@@ -237,19 +235,20 @@ int modelling_system_list(Queue_list *queue_1, Queue_list *queue_2, List_q ***em
     {
         if (real_time < 0)
         {
-            create_time(&time_come1,&time_work1, t_all1[0], t_all1[1], t_all1[2], t_all1[3]);    
+			real_time = 0;
+            create_time(&time_come1,&time_work1, t_all1[0], t_all1[1], t_all1[2], t_all1[3],real_time);    
             time_obrab1 += time_work1;
             push_Queue_list(queue_1, time_work1, time_come1);
             delete_empty_area(empty_area, queue_1, k, &h);
             count_queue1++;
-            create_time(&time_come2,&time_work2, t_all2[0], t_all2[1], t_all2[2], t_all2[3]);
+            create_time(&time_come2,&time_work2, t_all2[0], t_all2[1], t_all2[2], t_all2[3],real_time);
             push_Queue_list(queue_2, time_work2, time_come2);
             delete_empty_area(empty_area, queue_2, k, &h);
             count_queue2++;
             time_obrab2 += time_work2;
             count_applications_enter1++;
             count_applications_enter2++;
-            real_time = 0;
+            
         }
         else
         {     
@@ -257,7 +256,7 @@ int modelling_system_list(Queue_list *queue_1, Queue_list *queue_2, List_q ***em
             {
                 if (queue_1->Pout->time1.time_come > queue_2->Pout->time1.time_come)
                 {
-                    create_time(&time_come2,&time_work2, t_all2[0], t_all2[1], t_all2[2], t_all2[3]);
+                    create_time(&time_come2,&time_work2, t_all2[0], t_all2[1], t_all2[2], t_all2[3],real_time);
                     push_Queue_list(queue_2, time_work2, time_come2);
                     delete_empty_area(empty_area, queue_2, k, &h);
                     time_obrab2 += time_work2;
@@ -270,7 +269,7 @@ int modelling_system_list(Queue_list *queue_1, Queue_list *queue_2, List_q ***em
                 }
                 else
                 {
-                    create_time(&time_come1,&time_work1, t_all1[0], t_all1[1], t_all1[2], t_all1[3]);
+                    create_time(&time_come1,&time_work1, t_all1[0], t_all1[1], t_all1[2], t_all1[3],real_time);
                     push_Queue_list(queue_1, time_work1, time_come1);
                     delete_empty_area(empty_area, queue_1, k, &h);
                     time_obrab1 += time_work1;
@@ -289,17 +288,20 @@ int modelling_system_list(Queue_list *queue_1, Queue_list *queue_2, List_q ***em
             else if (real_time < queue_1->Pout->time1.time_come && real_time > queue_2->Pout->time1.time_come)
             {
                 sr_time_in_queue2 += (real_time - queue_2->Pout->time1.time_come);
-                while (time_come2 <= real_time)
+                
+				time_obrab2 += time_work2;
+                    
+                
+				while (time_come2 <= real_time)
                 {
-                    create_time(&time_come2,&time_work2, t_all2[0], t_all2[1], t_all2[2], t_all2[3]);
+                    create_time(&time_come2,&time_work2, t_all2[0], t_all2[1], t_all2[2], t_all2[3],real_time);
                     push_Queue_list(queue_2, time_work2, time_come2);
                     delete_empty_area(empty_area, queue_2, k, &h);
                     count_queue2++;
-                    time_obrab2 += time_work2;
+                    
                     count_applications_enter2++;
                 }
-                    
-                if (real_time < (queue_2->Pout->time1.time_work + queue_2->Pout->time1.time_come))
+				if (real_time < (queue_2->Pout->time1.time_work + queue_2->Pout->time1.time_come))
                     real_time = (queue_2->Pout->time1.time_work + queue_2->Pout->time1.time_come);
                 filling_empty_area(empty_area, queue_2, k, size_emty_area);
                 pop_list(queue_2);
@@ -310,17 +312,20 @@ int modelling_system_list(Queue_list *queue_1, Queue_list *queue_2, List_q ***em
             else if (real_time > queue_1->Pout->time1.time_come && real_time < queue_2->Pout->time1.time_come)
             {
                 sr_time_in_queue1 += (real_time - queue_1->Pout->time1.time_come);
-                while (time_come1 <= real_time)
+                
+				time_obrab1 += time_work1;
+                    
+                
+				while (time_come1 <= real_time)
                 {
-                    create_time(&time_come1,&time_work1, t_all1[0], t_all1[1], t_all1[2], t_all1[3]);
+                    create_time(&time_come1,&time_work1, t_all1[0], t_all1[1], t_all1[2], t_all1[3],real_time);
                     push_Queue_list(queue_1, time_work1, time_come1);
                     delete_empty_area(empty_area, queue_1, k, &h);
                     count_queue1++;    
-                    time_obrab1 += time_work1;
+                    
                     count_applications_enter1++;
                 }
-                    
-                if (real_time < (queue_1->Pout->time1.time_work + queue_1->Pout->time1.time_come))
+				if (real_time < (queue_1->Pout->time1.time_work + queue_1->Pout->time1.time_come))
                     real_time = (queue_1->Pout->time1.time_work + queue_1->Pout->time1.time_come);
                 filling_empty_area(empty_area, queue_1, k, size_emty_area);
                 pop_list(queue_1);
@@ -337,27 +342,30 @@ int modelling_system_list(Queue_list *queue_1, Queue_list *queue_2, List_q ***em
             {
                 sr_time_in_queue1 += (real_time - queue_1->Pout->time1.time_come);
                 sr_time_in_queue2 += (real_time - queue_2->Pout->time1.time_come);
-                while (time_come1 <= real_time)
+               
+                time_obrab2 += time_work2;
+                
+                
+				while (time_come1 <= real_time)
                 {
-                    create_time(&time_come1,&time_work1, t_all1[0], t_all1[1], t_all1[2], t_all1[3]);
+                    create_time(&time_come1,&time_work1, t_all1[0], t_all1[1], t_all1[2], t_all1[3],real_time);
                     push_Queue_list(queue_1, time_work1, time_come1);
                     delete_empty_area(empty_area, queue_1, k, &h);
                     count_queue1++;    
-                    time_obrab1 += time_work1;
+                    
                     count_applications_enter1++;
                 }
+				time_obrab1 += time_work1;
                 while (time_come2 <= real_time)
                 {
-                    create_time(&time_come2,&time_work2, t_all2[0], t_all2[1], t_all2[2], t_all2[3]);
+                    create_time(&time_come2,&time_work2, t_all2[0], t_all2[1], t_all2[2], t_all2[3],real_time);
                     push_Queue_list(queue_2, time_work2, time_come2);
                     delete_empty_area(empty_area, queue_2, k, &h);
                     count_queue2++;    
-                    time_obrab2 += time_work2;
+                    
                     count_applications_enter2++;
                 }
-                
-                
-                if (real_time < (queue_1->Pout->time1.time_work + queue_1->Pout->time1.time_come))
+				if (real_time < (queue_1->Pout->time1.time_work + queue_1->Pout->time1.time_come))
                     real_time = (queue_1->Pout->time1.time_work + queue_1->Pout->time1.time_come);
                 filling_empty_area(empty_area, queue_1, k, size_emty_area);
                 pop_list(queue_1);
@@ -464,17 +472,18 @@ int modelling_system_arr(Arr_q *queue_1, Arr_q *queue_2, int *t_all1, int *t_all
     {
         if (real_time < 0)
         {
-            create_time(&time_come1,&time_work1, t_all1[0], t_all1[1], t_all1[2], t_all1[3]);    
+			real_time = 0;
+            create_time(&time_come1,&time_work1, t_all1[0], t_all1[1], t_all1[2], t_all1[3],real_time);    
             time_obrab1 += time_work1;
             push_Queue_arr(queue_1, time_work1, time_come1);
             count_queue1++;
-            create_time(&time_come2,&time_work2, t_all2[0], t_all2[1], t_all2[2], t_all2[3]);
+            create_time(&time_come2,&time_work2, t_all2[0], t_all2[1], t_all2[2], t_all2[3],real_time);
             push_Queue_arr(queue_2, time_work2, time_come2);
             count_queue2++;
             time_obrab2 += time_work2;
             count_applications_enter1++;
             count_applications_enter2++;
-            real_time = 0;
+            
         }
         else
         {     
@@ -482,7 +491,7 @@ int modelling_system_arr(Arr_q *queue_1, Arr_q *queue_2, int *t_all1, int *t_all
             {
                 if (queue_1->Pout->time_come > queue_2->Pout->time_come)
                 {
-                    create_time(&time_come2,&time_work2, t_all2[0], t_all2[1], t_all2[2], t_all2[3]);
+                    create_time(&time_come2,&time_work2, t_all2[0], t_all2[1], t_all2[2], t_all2[3],real_time);
                     push_Queue_arr(queue_2, time_work2, time_come2);
                 
                     time_obrab2 += time_work2;
@@ -494,7 +503,7 @@ int modelling_system_arr(Arr_q *queue_1, Arr_q *queue_2, int *t_all1, int *t_all
                 }
                 else
                 {
-                    create_time(&time_come1,&time_work1, t_all1[0], t_all1[1], t_all1[2], t_all1[3]);
+                    create_time(&time_come1,&time_work1, t_all1[0], t_all1[1], t_all1[2], t_all1[3],real_time);
                     push_Queue_arr(queue_1, time_work1, time_come1);
                     time_obrab1 += time_work1;
                     count_applications_enter1++;
@@ -512,7 +521,7 @@ int modelling_system_arr(Arr_q *queue_1, Arr_q *queue_2, int *t_all1, int *t_all
                 sr_time_in_queue2 += (real_time - queue_2->Pout->time_come);
                 while (time_come2 <= real_time)
                 {
-                    create_time(&time_come2,&time_work2, t_all2[0], t_all2[1], t_all2[2], t_all2[3]);
+                    create_time(&time_come2,&time_work2, t_all2[0], t_all2[1], t_all2[2], t_all2[3],real_time);
                     push_Queue_arr(queue_2, time_work2, time_come2);
                     count_queue2++;
                     time_obrab2 += time_work2;
@@ -530,7 +539,7 @@ int modelling_system_arr(Arr_q *queue_1, Arr_q *queue_2, int *t_all1, int *t_all
                 sr_time_in_queue1 += (real_time - queue_1->Pout->time_come);
                 while (time_come1 <= real_time)
                 {
-                    create_time(&time_come1,&time_work1, t_all1[0], t_all1[1], t_all1[2], t_all1[3]);
+                    create_time(&time_come1,&time_work1, t_all1[0], t_all1[1], t_all1[2], t_all1[3],real_time);
                     push_Queue_arr(queue_1, time_work1, time_come1);
                     count_queue1++;    
                     time_obrab1 += time_work1;
@@ -553,7 +562,7 @@ int modelling_system_arr(Arr_q *queue_1, Arr_q *queue_2, int *t_all1, int *t_all
                 sr_time_in_queue2 += (real_time - queue_2->Pout->time_come);
                 while (time_come1 <= real_time)
                 {
-                    create_time(&time_come1,&time_work1, t_all1[0], t_all1[1], t_all1[2], t_all1[3]);
+                    create_time(&time_come1,&time_work1, t_all1[0], t_all1[1], t_all1[2], t_all1[3],real_time);
                     push_Queue_arr(queue_1, time_work1, time_come1);
                     count_queue1++;    
                     time_obrab1 += time_work1;
@@ -561,7 +570,7 @@ int modelling_system_arr(Arr_q *queue_1, Arr_q *queue_2, int *t_all1, int *t_all
                 }
                 while (time_come2 <= real_time)
                 {
-                    create_time(&time_come2,&time_work2, t_all2[0], t_all2[1], t_all2[2], t_all2[3]);
+                    create_time(&time_come2,&time_work2, t_all2[0], t_all2[1], t_all2[2], t_all2[3],real_time);
                     push_Queue_arr(queue_2, time_work2, time_come2);
                     count_queue2++;    
                     time_obrab2 += time_work2;
