@@ -117,8 +117,9 @@ int pop_list(Queue_list *list)
 
 void create_time(double *time_come,double *time_work, double t1, double t2, double t3, double t4, double real_time)
 {
-    *time_come = t1 + (t2 - t1) * (double)rand() / (double)RAND_MAX;
-    *time_come += real_time;
+	double tmp;
+    tmp = t1 + (t2 - t1) * (double)rand() / (double)RAND_MAX;
+    *time_come += tmp;
     *time_work = t3 + (t4 - t3) * (double)rand() / (double)RAND_MAX;
 }
 
@@ -207,7 +208,7 @@ void print_sost(Queue_list *q1,Queue_list *q2,List_q **empty_area,int k)
 }
 
 
-int modelling_system_list(Queue_list *queue_1, Queue_list *queue_2, List_q ***empty_area, int *k, int *size_emty_area, int *t_all1, int *t_all2)
+int modelling_system_list(Queue_list *queue_1, Queue_list *queue_2, List_q ***empty_area, int *k, int *size_emty_area, double *t_all1, double *t_all2)
 {
     int counter_loop = 0;
     double time_come1 = 0;
@@ -395,7 +396,8 @@ int modelling_system_list(Queue_list *queue_1, Queue_list *queue_2, List_q ***em
             }    
         }
     }
-    time_prost1 = real_time - (time_obrab1 + time_obrab2);
+    time_prost1 = -real_time + ((double)count_applications_exit1*(((double)t_all1[2]+(double)t_all1[3])/2) + (double)count_applications_exit2*(((double)t_all2[2]+(double)t_all2[3])/2));
+    //time_prost1 = -real_time + (time_obrab1 + time_obrab2);
     printf("\nВремя моделирования = %f\n",real_time);
     printf("Время простоя OA = %f\n",time_prost1);
     printf("Количество вошедших и вышедших заявок в первой очереди: %d; %d\n",count_applications_enter1, count_applications_exit1);
@@ -403,7 +405,8 @@ int modelling_system_list(Queue_list *queue_1, Queue_list *queue_2, List_q ***em
     printf("Аппарат сработал: %d раз\n",count_applications_exit1 + count_applications_exit2);
     printf("Время работы ОА для первой очереди составило: %f\n",(double)count_applications_exit1*(((double)t_all1[2]+(double)t_all1[3])/2));
     printf("Время работы ОА для второй очереди составило: %f\n",(double)count_applications_exit2*(((double)t_all2[2]+(double)t_all2[3])/2));
-    double zayav = real_time / ((t_all1[0]+t_all1[1])/2);
+    double zayav = real_time / (double)((double)(t_all1[0]+t_all1[1])/2);
+
     printf("Погрешность =  %f%%\n",100*(fabs(zayav - count_applications_enter1)/zayav));
     int choose;
     while (1)
@@ -443,7 +446,7 @@ int modelling_system_list(Queue_list *queue_1, Queue_list *queue_2, List_q ***em
 
 
  
-int modelling_system_arr(Arr_q *queue_1, Arr_q *queue_2, int *t_all1, int *t_all2)
+int modelling_system_arr(Arr_q *queue_1, Arr_q *queue_2, double *t_all1, double *t_all2)
 {
     int counter_loop = 0;
     double time_come1 = 0;
@@ -786,17 +789,17 @@ int main(void)
     setbuf(stdout, NULL);
     int choose;
     
-    int t1[4];
-    int t2[4];
+    double t1[4];
+    double t2[4];
     printf("Введите границы интервала времени прихода и работы первой очереди:\n");
     printf("tc11 tc12 tw11 tw12 = ");
-    if (scanf("%d %d %d %d",&t1[0], &t1[1], &t1[2], &t1[3]) != 4 || t1[1]-t1[0] <= 0 || t1[3]-t1[2] <= 0)
+    if (scanf("%lf %lf %lf %lf",&t1[0], &t1[1], &t1[2], &t1[3]) != 4 || (t1[1] == 0 && t1[0] == 0) || (t1[3] == 0 && t1[2] == 0) || t1[0] < 0 || t1[1] < 0 || t1[2] < 0 || t1[3] < 0)
     {
         printf("Некорректные границы");
         return -1;
     }
     printf("tc21 tc22 tw21 tw22 = ");
-    if (scanf("%d %d %d %d",&t2[0], &t2[1], &t2[2], &t2[3]) != 4 || t2[1]-t2[0] <= 0 || t2[3]-t2[2] <= 0)
+    if (scanf("%lf %lf %lf %lf",&t2[0], &t2[1], &t2[2], &t2[3]) != 4 || (t2[1] == 0 && t2[0] == 0) || (t2[3] == 0 && t2[2] == 0) || t2[0] < 0 || t2[1] < 0 || t2[2] < 0 || t2[3] < 0)
     {
         printf("Некорректные границы");
         return -1;
