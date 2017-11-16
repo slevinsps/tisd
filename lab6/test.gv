@@ -1,0 +1,6 @@
+digraph test_tree {
+hello -> fzck;
+hello -> only;
+fzck -> everyone;
+only -> somebody;
+}

@@ -1,0 +1,10 @@
+digraph test_tree {
+hello -> fuck;
+hello -> only;
+fuck -> everyone;
+fuck -> fuck;
+fuck -> fuck;
+fuck -> fuck;
+fuck -> fzck;
+only -> somebody;
+}
