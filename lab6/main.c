@@ -13,10 +13,13 @@
 #define MEMORY_ERROR -4
 #define NOT_ALL_ARGUMENTS -5
 
+# define SEP "\"., ?!\n" 
+# define SIZE_BUF 300
 
 typedef struct tree_node
 {
 	char *s;
+	unsigned int frequency;
 	struct tree_node *left;
 	struct tree_node *right;	
 } tree_node;
@@ -27,6 +30,7 @@ tree_node* create_node(char *s)
     if (node)
     {
         node->s = s;
+        node->frequency = 1;
         node->left = NULL;
         node->right = NULL;
     }
@@ -35,17 +39,22 @@ tree_node* create_node(char *s)
 
 tree_node* insert(tree_node *tree, tree_node *node)
 {
+	
     int cmp;
     if (tree == NULL)
+	{
         return node;
-
+	}
+	
+	
     cmp = strcmp(node->s, tree->s);
 	
     if (cmp < 0)
         tree->left = insert(tree->left, node);
-    else if (cmp >= 0)
+    else if (cmp > 0)
         tree->right = insert(tree->right, node);
-
+	else
+		tree->frequency++;
     return tree;
 }
 
@@ -58,7 +67,7 @@ char* min_current( tree_node *tree)
 	return tree->s;
 }
 
-void apply(struct tree_node *tree)
+void apply(tree_node *tree)
 {
     if (tree == NULL)
         return;
@@ -133,10 +142,111 @@ tree_node* delete(tree_node *tree, char* s)
     return tree;
 }
 
+const char *strchr1(const char *str, char symbol)
+{
+    const char *c = NULL;
+    int len = strlen(str);
+    for (int i = 0; i < len; i++)
+    {
+        if (str[i] == symbol)
+        {
+            c = &(str[i]);
+            break;
+        }
+    }
+    return c;
+}
+
+int count_words(const char *str)
+{
+    int n = 0;
+    int len = strlen(str);
+    for (int i = 0;i < len;i++)
+    {
+        if (!strchr1(SEP, str[i]) && (i == 0 || strchr1(SEP, str[i-1])))
+            n++;
+    }
+    return n;
+}
+
+void split_words(char *str, char **words, int ind)
+{
+    int len = strlen(str);
+    for (int i = 0;i < len;i++)
+    {
+        if (!strchr1(SEP, str[i])) 
+        {
+            if (i == 0 || str[i-1] == 0)
+            {
+                words[ind] = &(str[i]);
+                ind++;
+            }
+        }
+        else
+            str[i] = 0;
+    }    
+} 
+
+int find_words_literal_tree(tree_node *tree, char liter)
+{
+	int count_words = 0;
+	if (tree == NULL)
+		return 0;
+	if (liter < tree->s[0])
+	{
+		count_words += find_words_literal_tree(tree->left, liter);
+	}
+	else if (liter > tree->s[0]) 
+	{
+		count_words += find_words_literal_tree(tree->right, liter);
+	}
+	else
+	{
+		count_words += tree->frequency;
+		count_words += find_words_literal_tree(tree->left, liter);
+		count_words += find_words_literal_tree(tree->right, liter);
+	}	
+	return count_words;
+}
 
 
+int find_words_literal_arr(char **words, int n, char liter)
+{
+	int count_words = 0;
+	for (int i = 0; i < n; i++)
+	{
+		if (words[i][0] == liter)
+		{
+			count_words++;
+		}
+	}
+	return count_words;
+}
 
-void apply_pre(struct tree_node *tree, void (*f)(struct tree_node*, void*), void *arg)
+
+void print_color_words(tree_node *tree, char literal, FILE *f)
+{
+	if (tree == NULL)
+		return;
+	if (literal < tree->s[0])
+	{
+		print_color_words(tree->left, literal, f);
+	}
+	else if (literal > tree->s[0]) 
+	{
+		print_color_words(tree->right, literal, f);
+	}
+	else
+	{
+		fprintf(f,"%s [fillcolor=\"yellow\"];\n",tree->s);
+		print_color_words(tree->left, literal, f);
+		print_color_words(tree->right, literal, f);
+	}	
+	
+}
+
+
+void apply_pre(tree_node *tree, void (*f)(tree_node*, void*), void *arg)
 {
     if (tree == NULL)
         return;
@@ -146,7 +256,7 @@ void apply_pre(struct tree_node *tree, void (*f)(struct tree_node*, void*), void
     apply_pre(tree->right, f, arg);
 }
 
-void to_dot(struct tree_node *tree, void *param)
+void to_dot(tree_node *tree, void *param)
 {
     FILE *f = param;
 
@@ -157,64 +267,159 @@ void to_dot(struct tree_node *tree, void *param)
         fprintf(f, "%s -> %s;\n", tree->s, tree->right->s);
 }
 
-void export_to_dot(FILE *f, const char *tree_name, struct tree_node *tree)
+void export_to_dot(FILE *f, const char *tree_name, tree_node *tree, char literal)
 {
     fprintf(f, "digraph %s {\n", tree_name);
-
+    fprintf(f, "node [shape=\"circle\", style=\"filled\", fillcolor=\"white\", fontcolor=\"black\", margin=\"0.01\"];\n");
+	print_color_words(tree, literal, f);
     apply_pre(tree, to_dot, f);
 
     fprintf(f, "}\n");
 }
 
-int main(void)
+unsigned long long tick(void)
 {
+    unsigned long long d;
+    __asm__ __volatile__ ("rdtsc" : "=A" (d));
+    return d;
+}
+
+
+int find_high(tree_node *tree)
+{
+	if(tree == 0)
+        return 0;
+    int left, right;
+    if (tree->left != NULL)
+	{
+        left = find_high(tree->left);
+    }
+	else 
+        left = -1;
+    if (tree->right != NULL) 
+	{
+        right = find_high(tree->right);
+    }
+	else 
+        right = -1;
+    int max = left > right ? left : right;
+    return max+1;
+}
+
+
+
+void test_time(void)
+{
+	srand(time(NULL));
 	tree_node *root = NULL;
 	tree_node *node;
-	node = create_node("hello");
-	root = insert(root, node);
-	node = create_node("fuck");
-	root = insert(root, node);
-	node = create_node("everyone");
-	root = insert(root, node);
-	node = create_node("only");
-	root = insert(root, node);
-	node = create_node("somebody");
-	root = insert(root, node);
+	unsigned long long tb, te, t_mid = 0;
+	char **words = NULL;
+	int n = 20;
+	int num;
+	char *string = malloc(6);
+	//words = realloc(words,n*sizeof(char *));
 	
-	node = create_node("fuck");
-	root = insert(root, node);
-	node = create_node("fuck");
-	root = insert(root, node);
-	node = create_node("fuck");
-	root = insert(root, node);
-	node = create_node("fzck");
-	root = insert(root, node);
+	for (int i = 5; i < 25; i++)
 	{
+		t_mid = 0;
+		while(find_high(root) < i)
+		{
+			num = 100 + rand() % 800;
+			itoa(num, string, 10);
+			//string[3] = 0;
+			node = create_node(string);
+			tb = tick();
+			root = insert(root, node);
+			te = tick();
+			t_mid += (te-tb);
+			string = malloc(6);
+		}
+		printf("%3d  %I64d\n", i, t_mid);
+	}
+	//printf("\n\n");
+	//apply(root);
+	/* {
         FILE *f = fopen("test1.gv", "w");
-
         assert(f);
 
-        export_to_dot(f, "test_tree", root);
-
+        export_to_dot(f, "test_tree", root, 'h');
+		
         fclose(f);
-    }
-	tree_node* search_node = search(root, "fuck");
+    } */
+	
+}
+
+
+
+int main(void)
+{
+	/* tree_node *root = NULL;
+	tree_node *node;
+	unsigned long long tb, te;
+	
+	char *string = malloc(SIZE_BUF);
+	FILE *f = fopen("in.txt","r");
+	int n = 0;
+	char **words = NULL;
+	int ind = 0;
+	setbuf(stdout,NULL); */
+	
+	
+	test_time();
+	/* while(fgets(string,SIZE_BUF - 2,f))
+	{
+		n += count_words(string);
+		words = realloc(words,n*sizeof(char *));
+		split_words(string, words, ind);
+		ind = n;
+		string = malloc(SIZE_BUF);
+	}
+
+	for (int i = 0; i < n ; i++)
+    {
+		node = create_node(words[i]);
+		root = insert(root, node);
+    } 
+	char literal;
+	int count_words;
+	int count_words2;
+	printf("Программа ищет количество слов в файле, начинающихся на определенную букву\n");
+	printf("Введите букву: ");
+	scanf("%c",&literal);
+	
+	tb = tick();
+	count_words = find_words_literal_tree(root, literal);
+	te = tick();
+	printf("Время на подсчет с помощью дерева: %I64d\n",  te-tb);
+	
+	
+	tb = tick();
+	count_words2 = find_words_literal_arr(words, n, literal);
+	te = tick();
+	printf("Время на подсчет из файла: %I64d\n",  te-tb);
+	
+	
+	printf("Количество слов на букву %c, посчитанных деревом = %d\n",literal, count_words);
+	printf("Количество слов на букву %c, посчитанных из файла = %d\n",literal, count_words2);
+	printf("hight = %d\n",find_deep(root));
+	//apply(root);
+	{
+        FILE *f = fopen("test1.gv", "w");
+        assert(f);
+
+        export_to_dot(f, "test_tree", root, literal);
+		
+        fclose(f);
+    } */
+	
+	/* tree_node* search_node = search(root, "fuck"); // удаление
 	while (search_node)	
 	{
 		root = delete(root, "fuck");
 		search_node = search(root, "fuck");
 	}
-	
-	apply(root);
-	{
-        FILE *f = fopen("test.gv", "w");
-
-        assert(f);
-
-        export_to_dot(f, "test_tree", root);
-
-        fclose(f);
-    }
+	*/
 
 	
 }
