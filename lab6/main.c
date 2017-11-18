@@ -45,8 +45,6 @@ tree_node* insert(tree_node *tree, tree_node *node)
 	{
         return node;
 	}
-	
-	
     cmp = strcmp(node->s, tree->s);
 	
     if (cmp < 0)
@@ -56,6 +54,77 @@ tree_node* insert(tree_node *tree, tree_node *node)
 	else
 		tree->frequency++;
     return tree;
+}
+
+int dist(tree_node *tree)
+{
+	if(tree == 0)
+        return 0;
+    int left, right;
+    if (tree->left != NULL)
+	{
+        left = dist(tree->left);
+    }
+	else 
+        left = -1;
+    if (tree->right != NULL) 
+	{
+        right = dist(tree->right);
+    }
+	else 
+        right = -1;
+    int min;
+	if (left > right)
+	{
+		if (right != -1)
+			min = right;
+		else
+			min = left;
+	}
+	else
+	{
+		if (left != -1)
+			min = left;
+		else
+			min = right;		
+	}
+    return min+1;
+}
+
+tree_node* insert_left_tree(tree_node *tree, tree_node *node)
+{
+	int cmp;
+	tree_node *tmp;
+	if (tree == NULL) 
+	{
+		return node;
+	}
+	if (node == NULL) 
+		return tree;
+	
+	cmp = strcmp(node->s, tree->s);
+	if (cmp == 0)
+		return tree;
+
+	if (cmp < 0)
+	{
+		
+		tmp = tree;
+		tree = node;
+		node = tmp;
+	}
+	//  100 150 250 350
+	tree->right = insert_left_tree(tree->right, node);
+	
+	if ((tree->left == NULL && tree->right != NULL) || dist(tree->right) > dist(tree->left))
+	{
+		
+		tmp = tree->right;
+		tree->right = tree->left;
+		tree->left = tmp;
+	}
+	//dist(x) = min(dist(x.left), dist(x.right)) + 1 // пересчитаем расстояние до ближайшей свободной позиции
+	return tree;
 }
 
 char* min_current( tree_node *tree)
@@ -74,10 +143,10 @@ void apply(tree_node *tree)
 
     // pre-order
     // f(tree, arg);
-	printf("%s ",tree->s);
+	
     apply(tree->left);
     // in-order
-    
+    printf("%s ",tree->s);
     apply(tree->right);
     // post-order
     // f(tree, arg);
@@ -102,6 +171,7 @@ tree_node* search(tree_node *tree, char *s)
 
 tree_node* delete(tree_node *tree, char* s)
 {
+	tree_node *tmp;
     int cmp;
     if (tree == NULL)
         return tree;
@@ -130,11 +200,24 @@ tree_node* delete(tree_node *tree, char* s)
 		{
 			if (tree->left != NULL)
 			{
-				tree = tree->left;
+				tree->frequency--;
+				if (tree->frequency == 0)
+				{
+					tmp = tree;
+					tree = tree->left;
+					free(tmp);
+				}
+				
 			}
 			else
 			{
-				tree = tree->right;
+				tree->frequency--;
+				if (tree->frequency == 0)
+				{
+					tmp = tree;
+					tree = tree->right;
+					free(tmp);
+				}
 			}
 		}
 		
@@ -306,7 +389,31 @@ int find_high(tree_node *tree)
     return max+1;
 }
 
+void bubble_sort(char **words, int k)
+{
+	int cmp;
+	char *tmp;
+	for (int i = 0; i < k - 1; i++)
+	{
+		for (int j = i; j < k; j++)
+		{
+			cmp = strcmp(words[i], words[j]);
+			if (cmp > 0)
+			{
+				tmp = words[j];
+				words[j] = words[i];
+				words[i] = tmp;
+			}
+		}
+	}
+}
 
+int strcmp1(const char* s1, const char* s2)   // функция сравнения элементов массива
+{
+	int cmp;
+	cmp = strcmp(s1, s2);
+	return cmp;              // если результат вычитания равен 0, то числа равны, < 0: x1 < x2; > 0: x1 > x2
+}
 
 void test_time(void)
 {
@@ -315,19 +422,20 @@ void test_time(void)
 	tree_node *node;
 	unsigned long long tb, te, t_mid = 0;
 	char **words = NULL;
-	int n = 20;
+	int n = 100;
 	int num;
-	char *string = malloc(6);
-	//words = realloc(words,n*sizeof(char *));
-	
-	for (int i = 5; i < 25; i++)
+	char *string;
+	words = realloc(words,n*sizeof(char *));
+	printf("Эффективность сортировки:\n");
+	for (int i = 10; i <= n; i += 10)
 	{
 		t_mid = 0;
-		while(find_high(root) < i)
+		string = malloc(6);
+		for (int j = 0; j < i; j++)
 		{
 			num = 100 + rand() % 800;
 			itoa(num, string, 10);
-			//string[3] = 0;
+			words[j] = string;
 			node = create_node(string);
 			tb = tick();
 			root = insert(root, node);
@@ -335,18 +443,58 @@ void test_time(void)
 			t_mid += (te-tb);
 			string = malloc(6);
 		}
-		printf("%3d  %I64d\n", i, t_mid);
-	}
-	//printf("\n\n");
-	//apply(root);
-	/* {
-        FILE *f = fopen("test1.gv", "w");
-        assert(f);
-
-        export_to_dot(f, "test_tree", root, 'h');
 		
-        fclose(f);
-    } */
+		
+		tb = tick();
+		bubble_sort(words, i);
+		//qsort(words, i, sizeof(string), (int (*)(const void *,const  void *)) strcmp);
+		te = tick();
+		printf("количество элементов = %3d; высота = %d; время (дерево) = %I64d; время (пузырек) = %I64d; отношение = %f\n", i, find_high(root), t_mid, te - tb, (float)(te - tb)/t_mid);
+		while(root)
+		{
+			root = delete(root, root->s);
+		}
+		root = NULL;
+	}
+	tree_node *sear;
+	char *sear1;
+	printf("Эффективность поиска:\n");
+	for (int i = 10; i <= n; i += 10)
+	{
+		t_mid = 0;
+		string = malloc(6);
+		for (int j = 0; j < i; j++)
+		{
+			num = 100 + rand() % 800;
+			itoa(num, string, 10);
+			words[j] = string;
+			node = create_node(string);
+			root = insert(root, node);
+			t_mid += (te-tb);
+			string = malloc(6);
+		}
+		tb = tick();
+		sear = search(root, "hello");
+		te = tick();
+		t_mid = te - tb;
+		tb = tick();
+		for(int j = 0; j < i; j++)
+		{
+			if (strcmp(words[j],"hello") == 0)
+			{
+				sear1 = words[j];
+			}
+		}
+		te = tick();
+		printf("количество элементов = %3d; высота = %d; время (дерево) = %I64d; время (файл) = %I64d; отношение = %f\n", i, find_high(root), t_mid, te - tb, (float)(te - tb)/t_mid);
+		while(root)
+		{
+			root = delete(root, root->s);
+		}
+		root = NULL;
+	}
+	
+
 	
 }
 
@@ -354,72 +502,162 @@ void test_time(void)
 
 int main(void)
 {
-	/* tree_node *root = NULL;
+	 tree_node *root = NULL;
 	tree_node *node;
 	unsigned long long tb, te;
 	
 	char *string = malloc(SIZE_BUF);
-	FILE *f = fopen("in.txt","r");
+	
 	int n = 0;
 	char **words = NULL;
 	int ind = 0;
-	setbuf(stdout,NULL); */
-	
-	
-	test_time();
-	/* while(fgets(string,SIZE_BUF - 2,f))
-	{
-		n += count_words(string);
-		words = realloc(words,n*sizeof(char *));
-		split_words(string, words, ind);
-		ind = n;
-		string = malloc(SIZE_BUF);
-	}
-
-	for (int i = 0; i < n ; i++)
-    {
-		node = create_node(words[i]);
-		root = insert(root, node);
-    } 
 	char literal;
-	int count_words;
+	int count_words1;
 	int count_words2;
-	printf("Программа ищет количество слов в файле, начинающихся на определенную букву\n");
-	printf("Введите букву: ");
-	scanf("%c",&literal);
 	
-	tb = tick();
-	count_words = find_words_literal_tree(root, literal);
-	te = tick();
-	printf("Время на подсчет с помощью дерева: %I64d\n",  te-tb);
-	
-	
-	tb = tick();
-	count_words2 = find_words_literal_arr(words, n, literal);
-	te = tick();
-	printf("Время на подсчет из файла: %I64d\n",  te-tb);
-	
-	
-	printf("Количество слов на букву %c, посчитанных деревом = %d\n",literal, count_words);
-	printf("Количество слов на букву %c, посчитанных из файла = %d\n",literal, count_words2);
-	printf("hight = %d\n",find_deep(root));
-	//apply(root);
+	setbuf(stdout,NULL); 
+	int r = 1;
+	while(1)
 	{
-        FILE *f = fopen("test1.gv", "w");
-        assert(f);
-
-        export_to_dot(f, "test_tree", root, literal);
-		
-        fclose(f);
-    } */
-	
-	/* tree_node* search_node = search(root, "fuck"); // удаление
-	while (search_node)	
-	{
-		root = delete(root, "fuck");
-		search_node = search(root, "fuck");
+		printf("\nПрограмма ищет количество слов в файле, начинающихся на определенную букву\n");
+		printf("Меню:\n");
+		printf("1 - заполнить дерево из файла\n");
+		printf("2 - добавить элемент в дерево\n");
+		printf("3 - удалить элемент из дерева\n");
+		printf("4 - вывести количество слов на указанную букву\n");
+		printf("5 - вывести элементы дерева\n");
+		printf("6 - вывести эффективность\n\n");
+		printf("0 - выход\n");
+		int choose;
+		printf("Ваш выбор: ");
+		if (scanf("%d",&choose) == 1)
+		{
+			if (choose == 1)
+			{
+				FILE *f = fopen("in.txt","r");
+				while(fgets(string,SIZE_BUF - 2,f))
+				{
+					ind = n;
+					n += count_words(string);
+					words = realloc(words,n*2*sizeof(char *));
+					split_words(string, words, ind);
+					string = malloc(SIZE_BUF);
+				}
+			
+				for (int i = 0; i < n ; i++)
+				{
+					node = create_node(words[i]);
+					root = insert(root, node);
+					//root = insert_left_tree(root, node);
+				} 
+				fclose(f);
+				printf("Дерево заполнено!\n");
+			}			
+			else if (choose == 2)
+			{
+				r = 0;
+				char *str = malloc(SIZE_BUF);
+				printf("Введите слово: ");
+				scanf("%s",str);
+				fflush(stdin);
+				node = create_node(str);
+				root = insert(root, node);
+				
+				printf("Элемент добавлен!\n");
+			}
+			else if (choose == 3)
+			{
+				r = 0;
+				if (!root)
+				{
+					printf("Дерево пусто!\n");
+					break;
+				}
+				char *str_del = malloc(SIZE_BUF);
+				printf("Введите слово: ");
+				scanf("%s",str_del);
+				fflush(stdin);
+				
+				tree_node* search_node = search(root, str_del); // удаление
+				if (!search_node)
+				{
+					printf("Такого слова в дереве нет!\n");
+					break;
+				}
+				while (search_node)	
+				{
+					root = delete(root, str_del);
+					search_node = search(root, str_del);
+				}
+				if (!root)
+					printf("Дерево пусто!\n");
+				else
+					printf("Элемент удален!\n");
+			}
+			else if (choose == 4)
+			{
+				fflush(stdin);
+				printf("Введите букву: ");
+				scanf("%c",&literal);
+				
+				tb = tick();
+				count_words1 = find_words_literal_tree(root, literal);
+				te = tick();
+				printf("Время на подсчет с помощью дерева: %I64d\n",  te-tb);
+				
+				if (r)
+				{
+					tb = tick();
+					count_words2 = find_words_literal_arr(words, n, literal);
+					te = tick();
+					printf("Время на подсчет из файла: %I64d\n",  te-tb);
+				}
+				
+				printf("Количество слов на букву %c, посчитанных деревом = %d\n",literal, count_words1);
+				if (r)
+					printf("Количество слов на букву %c, посчитанных из файла = %d\n",literal, count_words2);
+				{
+					FILE *f = fopen("res.gv", "w");
+					assert(f);
+			
+					export_to_dot(f, "test_tree", root, literal);
+					
+					fclose(f);
+				} 
+				printf("В файле res.gv записано дерево на языке DOT\n");
+			
+			}
+			else if (choose == 5)
+			{
+				printf("Элементы дерева:\n");
+				apply(root);
+				printf("\n");
+			}
+			else if (choose == 6)
+			{
+				test_time();
+			}
+			else if (choose == 0)
+				break;
+			else
+			{
+				printf("Такого пункта меню нет!\n");
+				fflush(stdin);
+			}
+        }
+        else
+        {
+            printf("Такого пункта меню нет!\n");
+            fflush(stdin);
+        }   
 	}
-	*/
+	//test_time();
+	
+	
+	
+	
+	
+
 
 	
 }
