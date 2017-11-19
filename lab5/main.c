@@ -26,75 +26,70 @@ int input_razr(FILE *f, double **A, int **JA, IA **ia,int *counter_not_zero, int
     *counter_not_zero = 0;
     int counter_all = 0;
     IA *begin = NULL;
-    if (fscanf(f,"%d %d",n,m) == 2 && n > 0 && m > 0)
-    {
-        *A = malloc((*n)*(*m)*sizeof(double));
-        if (!*A)
-            return MEMORY_ERROR;
-        *JA = malloc((*n)*(*m)*sizeof(int));
-        if (!*JA)
-            return MEMORY_ERROR;
+    
+    *A = malloc((*n)*(*m)*sizeof(double));
+    if (!*A)
+        return MEMORY_ERROR;
+    *JA = malloc((*n)*(*m)*sizeof(int));
+    if (!*JA)
+        return MEMORY_ERROR;
 
+    IA *tmp = malloc(sizeof(IA));
+    if (!tmp)
+    {
+        free(*A);
+        free(*JA);
+        return MEMORY_ERROR;
+    }
+    tmp->Nk = 0;
+    tmp->number_row = 0;
+    tmp->next = NULL;
+    (*ia) = tmp;
+    begin = (*ia);
+    
+    for (int i = 0; i < *n; i++ )
+    {
+        for (int j = 0; j < *m; j++ )
+        {
+            if (fscanf(f,"%lf",&elem) != 1)
+            {
+                free(*A);
+                free(*JA);
+                return INVALID_NUMBER;
+            }
+            else
+            {
+                if (elem != 0)
+                {
+                    (*A)[*counter_not_zero] = elem;
+                    (*JA)[*counter_not_zero] = j;
+                    (*counter_not_zero)++;
+                }
+                counter_all++;
+            }  
+        }
+        
         IA *tmp = malloc(sizeof(IA));
         if (!tmp)
         {
             free(*A);
-            free(*JA);
+            free(*JA);                
             return MEMORY_ERROR;
         }
-        tmp->Nk = 0;
-        tmp->number_row = 0;
+        tmp->Nk = *counter_not_zero;
+        tmp->number_row = i+1;
         tmp->next = NULL;
+        (*ia)->next = tmp;
         (*ia) = tmp;
-        begin = (*ia);
-        
-        for (int i = 0; i < *n; i++ )
-        {
-            for (int j = 0; j < *m; j++ )
-            {
-                if (fscanf(f,"%lf",&elem) != 1)
-                {
-                    free(*A);
-                    free(*JA);
-                    return INVALID_NUMBER;
-                }
-                else
-                {
-                    if (elem != 0)
-                    {
-                        (*A)[*counter_not_zero] = elem;
-                        (*JA)[*counter_not_zero] = j;
-                        (*counter_not_zero)++;
-                    }
-                    counter_all++;
-                }  
-            }
-            
-            IA *tmp = malloc(sizeof(IA));
-            if (!tmp)
-            {
-                free(*A);
-                free(*JA);                
-                return MEMORY_ERROR;
-            }
-            tmp->Nk = *counter_not_zero;
-            tmp->number_row = i+1;
-            tmp->next = NULL;
-            (*ia)->next = tmp;
-            (*ia) = tmp;
-        }
-        *ia = begin;
     }
-    else
-    {
-        return INVALID_SIZE;
-    }
+    *ia = begin;
+    
+
     return OK;
 }
 
-int matr_to_razr(double **m1, double **A, int **JA, IA **ia, int *counter_not_zero, int n, int m)
+int matr_to_razr(double **m1, double **A, int **JA, IA **ia, int *counter_not_zero, int *n, int *m)
 {
-    double elem;
     *counter_not_zero = 0;
     int counter_all = 0;
     IA *begin = NULL;
@@ -126,7 +121,7 @@ int matr_to_razr(double **m1, double **A, int **JA, IA **ia, int *counter_not_ze
 
             if (m1[i][j] != 0)
             {
-                (*A)[*counter_not_zero] = elem;
+                (*A)[*counter_not_zero] = m1[i][j];
                 (*JA)[*counter_not_zero] = j;
                 (*counter_not_zero)++;
             }
@@ -148,11 +143,6 @@ int matr_to_razr(double **m1, double **A, int **JA, IA **ia, int *counter_not_ze
         (*ia) = tmp;
     }
     *ia = begin;
-    
-    else
-    {
-        return INVALID_SIZE;
-    }
     return OK;
 }
 
@@ -352,7 +342,7 @@ void print_time_size(void)
         f1 = fopen("v.txt","w");
         f2 = fopen("m.txt","w");
         
-        fprintf(f1,"%d %d\n",1,nn);
+        fprintf(f1,"%d\n",nn);
         k = 0;
         for (int i = 0; i < nn; i++)
         {
@@ -383,6 +373,9 @@ void print_time_size(void)
         
         f1 = fopen("v.txt","r");
         f2 = fopen("m.txt","r");
+		fscanf(f1,"%d",&m2);
+		n2 = 1;
+        fscanf(f2,"%d %d",&n1, &m1);
 
         
         input_razr(f2, &A, &JA, &elem_ia, &counter_not_zero1, &n1, &m1);
@@ -424,7 +417,7 @@ void print_time_size(void)
         printf("  %8.3f  ",(float)t_mid2/t_mid1);
         
         pam_razr = (sizeof(int)+sizeof(double))*(counter_not_zero1+counter_not_zero2);
-		pam_razr += (sizeof(IA)*(n1+1));
+        pam_razr += (sizeof(IA)*(n1+1));
         IA *copy;
         while (elem_ia)
         {
@@ -479,7 +472,7 @@ int main(void)
     
     setbuf(stdout,NULL);
     int err = OK;
-	printf("%I64d\n",sizeof(IA));
+    printf("%I64d\n",sizeof(IA));
     while(1)
     {
         int choose;
@@ -491,55 +484,99 @@ int main(void)
         printf("3 - Вывести сравнительную характеристику\n\n");
         printf("0 - Выход\n\n");
         printf("Ваш выбор: ");
-		int ch1;
+        int ch1;
+        int ch2;
+        int ii, jj;
+        double zn;
         if (scanf("%d",&choose) == 1)
         {
             if (choose == 1)
             {
-				//printf("1 - ввести элементы по индексам\n");
-				//printf("2 - ввести все элементы\n");
-				//printf("Выбор: ");
-				
-                printf("Введите размер и элементы вектора:\n");
-                err = input_razr(stdin, &B, &JB, &elem_ib, &counter_not_zero2, &n2, &m2);
-                if (err == INVALID_SIZE)
+                printf("1 - ввести элементы по индексам\n");
+                printf("2 - ввести все элементы\n");
+                printf("Выбор: ");
+                scanf("%d", &ch1);
+                if (ch1 == 1)
                 {
-                    printf("Некорректные размеры\n");
-                    return err;
-                }
-                if (err == INVALID_NUMBER)
-                {
-                    printf("Некорректный элемент вектора\n");
-                    return err;
-                }
-                if (err == MEMORY_ERROR)
-                {
-                    printf("Ошибка памяти\n");
-                    return err;
-                }
-                printf("Введите размер и элементы матрицы:\n");
-                err = input_razr(stdin, &A, &JA, &elem_ia, &counter_not_zero1, &n1, &m1);
-                if (err == INVALID_SIZE)
-                {
-                    printf("Некорректные размеры\n");
-                    return err;
-                }
-                if (err == INVALID_NUMBER)
-                {
-                    printf("Некорректный элемент матрицы\n");
-                    return err;
-                }
-                if (err == MEMORY_ERROR)
-                {
-                    printf("Ошибка памяти\n");
-                    return err;
-                }
-                if (m2 != n1)
-                {
-                    printf("Количество столбцов вектора не равно количеству строк матрицы!\n");
-                }
-                else
-                {
+                    
+                    printf("Введите размер вектора:\n");
+                    if (scanf("%d",&m2) != 1)
+                    {
+                        printf("Некорректный размер");
+                        return INVALID_SIZE;
+                    }
+                    n2 = 1;
+                    double **vector = allocate_matrix_row(n2,m2);                
+                    while(1)
+                    {
+                        printf("1 - Ввести очередной элемент вектора\n");
+                        printf("0 - Завершить\n");
+                        scanf("%d", &ch2);
+                        
+                        if (ch2 == 1)
+                        {
+                            printf("Введите номер элемента вектора(с 0): ");
+                            if (scanf("%d", &ii) != 1 || (ii >= m2 || ii < 0))
+                            {
+                                printf("Некорректный индекс\n");
+                                return INVALID_SIZE;
+                            }
+                            printf("\na[%d] = ",ii);
+                            if (scanf("%lf", &zn) != 1)
+                            {                        
+                                printf("Некорректный элемент\n");
+                                return INVALID_NUMBER;
+                            }
+                            vector[0][ii] = zn;
+                        }
+                        if (ch2 == 0)
+                        {
+                            break;
+                        }
+                    }
+                    matr_to_razr(vector, &B,  &JB, &elem_ib, &counter_not_zero2, &n2, &m2);
+                    printf("Введите размер матрицы через пробел:\n");
+                    if (scanf("%d %d",&n1, &m1) != 2)
+                    {
+                        printf("Некорректный размер");
+                        return INVALID_SIZE;
+                    }
+                    if (m2 != n1)
+                    {
+                        printf("Количество столбцов вектора не равно количеству строк матрицы!\n");
+                        return -5;
+                    }
+                    double **matrix = allocate_matrix_row(n1,m1);
+                    while(1)
+                    {
+                        printf("1 - Ввести очередной элемент матрицы\n");
+                        printf("0 - Завершить\n");
+                        scanf("%d", &ch2);
+                        
+                        if (ch2 == 1)
+                        {
+                            printf("Введите индексы элемента матрицы(с 0): ");
+                            if (scanf("%d %d", &ii, &jj) != 2 || (ii >= n1 || ii < 0 || jj >= m1 || jj < 0))
+                            {
+                                printf("Некорректный индекс\n");
+                                return INVALID_SIZE;
+                            }
+                            printf("\na[%d][%d] = ", ii, jj);
+                            if (scanf("%lf", &zn) != 1)
+                            {                        
+                                printf("Некорректный элемент\n");
+                                return INVALID_NUMBER;
+                            }
+                            matrix[ii][jj] = zn;
+                        }
+                        if (ch2 == 0)
+                        {
+                            break;
+                        }
+                    }
+                    matr_to_razr(matrix, &A,  &JA, &elem_ia, &counter_not_zero1, &n1, &m1);
+                    
+                    
                     printf("Вектор:\n");
                     print_razr(stdout, B, JB, elem_ib, counter_not_zero2, n2, m2);
                     printf("\n");
@@ -559,14 +596,7 @@ int main(void)
                     double **mat_res = allocate_matrix_row(n2, m1);
                     
                     razr_in_full(A, JA, elem_ia, B, JB, elem_ib, n1, m1, n2, &mat1, &mat2);
-					double *A11=NULL;
-					int *JA11 = NULL;
-					IA *ia11 = NULL;
-					int c11 = 0;
-                    int matr_to_razr(mat1, &A11, &JA11, &ia11, &c11, n1, m1);
-					razr_in_full(A11, JA11, ia11, B, JB, elem_ib, n1, m1, n2, &mat1, &mat2);
-					
-					
+  
                     tb = tick();
                     multiply_matrix(mat2, mat1, n2, m2, n1, m1, &mat_res);
                     te = tick();
@@ -597,6 +627,103 @@ int main(void)
                     }
                     free_matrix_rows(mat_res, n2);
                     free_matrix_rows(res, n2);
+                    
+                    
+                }
+                if (ch1 == 2)
+                {
+                    printf("Введите размер и элементы вектора:\n");
+                    if (scanf("%d",&m2) != 1)
+                    {
+                        printf("Некорректный размер");
+                        return INVALID_SIZE;
+                    }
+                    n2 = 1;
+                    err = input_razr(stdin, &B, &JB, &elem_ib, &counter_not_zero2, &n2, &m2);
+                    if (err == INVALID_NUMBER)
+                    {
+                        printf("Некорректный элемент вектора\n");
+                        return err;
+                    }
+                    if (err == MEMORY_ERROR)
+                    {
+                        printf("Ошибка памяти\n");
+                        return err;
+                    }
+                    printf("Введите размер и элементы матрицы:\n");
+                    if (scanf("%d %d",&n1, &m1) != 2)
+                    {
+                        printf("Некорректный размер");
+                        return INVALID_SIZE;
+                    }
+                    if (m2 != n1)
+                    {
+                        printf("Количество столбцов вектора не равно количеству строк матрицы!\n");
+                        return -5;
+                    }
+                    err = input_razr(stdin, &A, &JA, &elem_ia, &counter_not_zero1, &n1, &m1);
+                    if (err == INVALID_NUMBER)
+                    {
+                        printf("Некорректный элемент матрицы\n");
+                        return err;
+                    }
+                    if (err == MEMORY_ERROR)
+                    {
+                        printf("Ошибка памяти\n");
+                        return err;
+                    }
+        
+                    printf("Вектор:\n");
+                    print_razr(stdout, B, JB, elem_ib, counter_not_zero2, n2, m2);
+                    printf("\n");
+                    printf("Матрица:\n");
+                    print_razr(stdout, A, JA, elem_ia, counter_not_zero1, n1, m1);
+                    printf("\n");
+                    
+                    double **res = allocate_matrix_row(n2, m1);
+                    tb = tick();
+                    multiply_razr(A, JA, elem_ia, B, JB, elem_ib, res);
+                    te = tick();
+                    printf("Время выполнения умножения разреженных матриц = %I64d\n",te - tb);
+                    
+                    
+                    double **mat1;
+                    double **mat2;
+                    double **mat_res = allocate_matrix_row(n2, m1);
+                    
+                    razr_in_full(A, JA, elem_ia, B, JB, elem_ib, n1, m1, n2, &mat1, &mat2);                   
+                    
+                    tb = tick();
+                    multiply_matrix(mat2, mat1, n2, m2, n1, m1, &mat_res);
+                    te = tick();
+                    printf("Время выполнения стандартного умножения %I64d\n",te - tb);
+                    
+                    
+                    
+                    printf("Результат умножения разреженных матриц:\n");
+                    print_matrix(res, n2, m1);
+                    printf("Результат умножения обычных матриц:\n");
+                    print_matrix(mat_res, n2, m1);
+                    free(A);
+                    free(JA);
+                    free(B);
+                    free(JB);
+                    IA *copy;
+                    while (elem_ia)
+                    {
+                        copy = elem_ia;
+                        elem_ia = elem_ia->next;
+                        free(copy);
+                    }
+                    while (elem_ib)
+                    {
+                        copy = elem_ib;
+                        elem_ib = elem_ib->next;
+                        free(copy);
+                    }
+                    free_matrix_rows(mat_res, n2);
+                    free_matrix_rows(res, n2);
+                    
                 }
                 
             }
@@ -605,12 +732,14 @@ int main(void)
                 f1 = fopen("mat.txt","r");
                 f2 = fopen("vect.txt","r");
                 
-                err = input_razr(f2, &B, &JB, &elem_ib, &counter_not_zero2, &n2, &m2);
-                if (err == INVALID_SIZE)
+                
+                if (fscanf(f2,"%d",&m2) != 1)
                 {
-                    printf("Некорректные размеры\n");
-                    return err;
+                    printf("Некорректный размер");
+                    return INVALID_SIZE;
                 }
+                n2 = 1;
+                err = input_razr(f2, &B, &JB, &elem_ib, &counter_not_zero2, &n2, &m2);
                 if (err == INVALID_NUMBER)
                 {
                     printf("Некорректный элемент вектора\n");
@@ -621,12 +750,18 @@ int main(void)
                     printf("Ошибка памяти\n");
                     return err;
                 }
-                err = input_razr(f1, &A, &JA, &elem_ia, &counter_not_zero1, &n1, &m1);
-                if (err == INVALID_SIZE)
+                if (fscanf(f1,"%d %d",&n1, &m1) != 2)
                 {
-                    printf("Некорректные размеры\n");
-                    return err;
+                    printf("Некорректный размер");
+                    return INVALID_SIZE;
                 }
+                if (m2 != n1)
+                {
+                    printf("Количество столбцов вектора не равно количеству строк матрицы!\n");
+                    return -5;
+                }
+                err = input_razr(f1, &A, &JA, &elem_ia, &counter_not_zero1, &n1, &m1);
+
                 if (err == INVALID_NUMBER)
                 {
                     printf("Некорректный элемент матрицы\n");
@@ -639,62 +774,57 @@ int main(void)
                 }
                 fclose(f1);
                 fclose(f2);
-                if (m2 != n1)
+                
+                if (n1 < 20 && m1 < 20)
                 {
-                    printf("Количество столбцов вектора не равно количеству строк матрицы!\n");
+                    printf("Вектор:\n");
+                    print_razr(stdout, B, JB, elem_ib, counter_not_zero2, n2, m2);
+                    printf("\n");
+                    printf("Матрица:\n");
+                    print_razr(stdout, A, JA, elem_ia, counter_not_zero1, n1, m1);
+                    printf("\n");
                 }
-                else
+                double **res = allocate_matrix_row(n2, m1);
+                tb = tick();
+                multiply_razr(A, JA, elem_ia, B, JB, elem_ib, res);
+                te = tick();
+                printf("Время выполнения умножения разреженных матриц = %I64d\n",te - tb);
+                
+                double **mat1;
+                double **mat2;
+                double **mat_res = allocate_matrix_row(n2, m1);
+                
+                razr_in_full(A, JA, elem_ia, B, JB, elem_ib, n1, m1, n2, &mat1, &mat2);    
+                
+                tb = tick();
+                multiply_matrix(mat2, mat1, n2, m2, n1, m1, &mat_res);
+                te = tick();
+                printf("Время выполнения стандартного умножения %I64d\n",te - tb);
+                
+                printf("Результат умножения разреженных матриц:\n");
+                print_matrix(res, n2, m1);
+                printf("Результат умножения обычных матриц:\n");
+                print_matrix(mat_res, n2, m1);
+                free(A);
+                free(JA);
+                free(B);
+                free(JB);        
+                IA *copy;
+                while (elem_ia)
                 {
-					if (n1 < 20 && m1 < 20)
-					{
-						printf("Вектор:\n");
-						print_razr(stdout, B, JB, elem_ib, counter_not_zero2, n2, m2);
-						printf("\n");
-						printf("Матрица:\n");
-						print_razr(stdout, A, JA, elem_ia, counter_not_zero1, n1, m1);
-						printf("\n");
-					}
-                    double **res = allocate_matrix_row(n2, m1);
-                    tb = tick();
-                    multiply_razr(A, JA, elem_ia, B, JB, elem_ib, res);
-                    te = tick();
-                    printf("Время выполнения умножения разреженных матриц = %I64d\n",te - tb);
-                    
-                    double **mat1;
-                    double **mat2;
-                    double **mat_res = allocate_matrix_row(n2, m1);
-                    
-                    razr_in_full(A, JA, elem_ia, B, JB, elem_ib, n1, m1, n2, &mat1, &mat2);    
-                    
-                    tb = tick();
-                    multiply_matrix(mat2, mat1, n2, m2, n1, m1, &mat_res);
-                    te = tick();
-                    printf("Время выполнения стандартного умножения %I64d\n",te - tb);
-                    
-                    printf("Результат умножения разреженных матриц:\n");
-                    print_matrix(res, n2, m1);
-                    printf("Результат умножения обычных матриц:\n");
-                    print_matrix(mat_res, n2, m1);
-                    free(A);
-                    free(JA);
-                    free(B);
-                    free(JB);
-                    IA *copy;
-                    while (elem_ia)
-                    {
-                        copy = elem_ia;
-                        elem_ia = elem_ia->next;
-                        free(copy);
-                    }
-                    while (elem_ib)
-                    {
-                        copy = elem_ib;
-                        elem_ib = elem_ib->next;
-                        free(copy);
-                    }
-                    free_matrix_rows(mat_res, n2);
-                    free_matrix_rows(res, n2);
+                    copy = elem_ia;
+                    elem_ia = elem_ia->next;
+                    free(copy);
                 }
+                while (elem_ib)
+                {
+                    copy = elem_ib;
+                    elem_ib = elem_ib->next;
+                    free(copy);
+                }
+                free_matrix_rows(mat_res, n2);
+                free_matrix_rows(res, n2);
+                
                 
             }
             else if (choose == 3)
