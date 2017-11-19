@@ -651,13 +651,4 @@ int main(void)
             fflush(stdin);
         }   
 	}
-	//test_time();
-	
-	
-	
-	
-	
-
-
-	
 }
