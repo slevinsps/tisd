@@ -200,6 +200,7 @@ void get_column(int number, int n, double *A, int *JA, IA *elem_ia, int counter_
 void multiply_razr(double *A, int *JA, IA *ia, double *B, int *JB, IA *ib, double **res_matr)
 {
     int k = 0;
+	
     IA *ia_copy = ia;
     while(ib->next)
     {
@@ -211,11 +212,13 @@ void multiply_razr(double *A, int *JA, IA *ia, double *B, int *JB, IA *ib, doubl
             {
                 res_matr[k][JA[j]] += A[j] * B[i];
             }
+			
         }
         k++;
         ia = ia_copy;
         ib = ib->next;
     }    
+	
 }
 
 void free_matrix_rows(double **data, int n)
@@ -246,20 +249,21 @@ double **allocate_matrix_row(int n, int m)
 }
 
 
-int multiply_matrix(double **matrix1, double **matrix2, int n1, int m1, int n2, int m2, double ***matrix3)
+void multiply_matrix(double **matrix1, double **matrix2, int n1,
+		int m1, int n2, int m2, double **matrix3)
 {  
-    for (int ii = 0; ii < n1; ii++)
-    {
-        for (int i = 0; i < m2; i++)
+    //for (int ii = 0; ii < n1; ii++)
+    //{
+        for (int i = 0; i < 1000; i++)
         {
             //(*matrix3)[ii][i] = 0;
-            for (int j = 0; j < n2; j++)
+            for (int j = 0; j < 1000; j++)
             {
-                (*matrix3)[ii][i] += matrix1[ii][j] * matrix2[j][i];
+                matrix3[0][i] += matrix1[0][j] * matrix2[j][i];
             }
         }        
-    }  
-    return OK;
+    //}  
+    //return OK;
 }
 
 void razr_in_full(double *A, int *JA, IA *ia, double *B, int *JB, IA *ib, int n1, int m1, int n2, double ***mat1, double ***mat2)
@@ -314,7 +318,7 @@ void print_time_size(void)
     FILE *f1;
     FILE *f2;
     int w;
-    int nn = 900;
+    int nn = 1000;
     int k;
     double **mat1;
     double **mat2;
@@ -337,7 +341,7 @@ void print_time_size(void)
     printf("Матрица %dx%d\n",nn,nn);
     printf("  Процент         разреженная     классическая  отношение    разреженная     классическая    отношение \n");
     printf("заполнения          (время)          (время)                   (память)       (память)\n");
-    for (int e = size_matrix/10; e <= size_matrix; e+=(size_matrix/10))
+    for (int e = (size_matrix/10); e <= size_matrix; e+=(size_matrix/10))
     {
         pr+=10;
         f1 = fopen("v.txt","w");
@@ -381,9 +385,9 @@ void print_time_size(void)
         
         input_razr(f2, &A, &JA, &elem_ia, &counter_not_zero1, &n1, &m1);
         input_razr(f1, &B, &JB, &elem_ib, &counter_not_zero2, &n2, &m2);
+        razr_in_full(A, JA, elem_ia, B, JB, elem_ib, n1, m1, n2, &mat1, &mat2); 
         
-        
-        w = 100;
+        w = 10;
         t_mid1 = 0;
         for (int k = 0; k < w; k++)
         {
@@ -392,6 +396,7 @@ void print_time_size(void)
             te = tick();
             if (te > tb )
                 t_mid1 += ( te - tb );
+				//t_mid1 += tick() - tb;
             else
                 w--;
         }
@@ -399,17 +404,18 @@ void print_time_size(void)
         printf("%3d%%                %7I64d        ",pr,t_mid1);
         
         
-        razr_in_full(A, JA, elem_ia, B, JB, elem_ib, n1, m1, n2, &mat1, &mat2);    
+           
         t_mid2 = 0;
-        w = 100;
+        w = 10;
         mat_res = allocate_matrix_row(n2, n1);
         for (int k = 0; k < w; k++)
         {
             tb = tick();
-            multiply_matrix(mat2, mat1, n2, n1, n1, m1, &mat_res);
+            multiply_matrix(mat2, mat1, n2, n1, n1, m1, mat_res);
             te = tick();
             if (te > tb )
-                t_mid2 += ( te - tb );
+				t_mid2 += ( te - tb );
+                //t_mid2 += tick() - te ;
             else
                w--;
         }
@@ -599,7 +605,7 @@ int main(void)
                     razr_in_full(A, JA, elem_ia, B, JB, elem_ib, n1, m1, n2, &mat1, &mat2);
   
                     tb = tick();
-                    multiply_matrix(mat2, mat1, n2, m2, n1, m1, &mat_res);
+                    multiply_matrix(mat2, mat1, n2, m2, n1, m1, mat_res);
                     te = tick();
                     printf("Время выполнения стандартного умножения %I64d\n",te - tb);
                     
@@ -696,7 +702,7 @@ int main(void)
                     razr_in_full(A, JA, elem_ia, B, JB, elem_ib, n1, m1, n2, &mat1, &mat2);                   
                     
                     tb = tick();
-                    multiply_matrix(mat2, mat1, n2, m2, n1, m1, &mat_res);
+                    multiply_matrix(mat2, mat1, n2, m2, n1, m1, mat_res);
                     te = tick();
                     printf("Время выполнения стандартного умножения %I64d\n",te - tb);
                     
@@ -799,7 +805,7 @@ int main(void)
                 razr_in_full(A, JA, elem_ia, B, JB, elem_ib, n1, m1, n2, &mat1, &mat2);    
                 
                 tb = tick();
-                multiply_matrix(mat2, mat1, n2, m2, n1, m1, &mat_res);
+                multiply_matrix(mat2, mat1, n2, m2, n1, m1, mat_res);
                 te = tick();
                 printf("Время выполнения стандартного умножения %I64d\n",te - tb);
                 
