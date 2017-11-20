@@ -1,16 +1,12 @@
 digraph test_tree {
 node [shape="circle", style="filled", fillcolor="white", fontcolor="black", margin="0.01"];
-135 [fillcolor="yellow"];
-123 [fillcolor="yellow"];
-150 [fillcolor="yellow"];
-148 [fillcolor="yellow"];
-136 [fillcolor="yellow"];
-200 -> 135;
-200 -> 360;
+100 -> 135;
 135 -> 123;
 135 -> 150;
-150 -> 148;
 148 -> 136;
+150 -> 148;
+200 -> 100;
+200 -> 360;
 360 -> 226;
 360 -> 787;
 787 -> 457;

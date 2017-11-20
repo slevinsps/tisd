@@ -136,7 +136,7 @@ char* min_current( tree_node *tree)
 	return tree->s;
 }
 
-void apply(tree_node *tree)
+void apply_in(tree_node *tree)
 {
     if (tree == NULL)
         return;
@@ -144,10 +144,44 @@ void apply(tree_node *tree)
     // pre-order
     // f(tree, arg);
 	
-    apply(tree->left);
+    apply_in(tree->left);
     // in-order
     printf("%s ",tree->s);
-    apply(tree->right);
+    apply_in(tree->right);
+    // post-order
+    // f(tree, arg);
+}
+
+
+void apply_pre_ord(tree_node *tree)
+{
+    if (tree == NULL)
+        return;
+
+    // pre-order
+    // f(tree, arg);
+	printf("%s ",tree->s);
+    apply_pre_ord(tree->left);
+    // in-order
+    
+    apply_pre_ord(tree->right);
+    // post-order
+    // f(tree, arg);
+}
+
+void apply_post(tree_node *tree)
+{
+    if (tree == NULL)
+        return;
+
+    // pre-order
+    // f(tree, arg);
+	
+    apply_post(tree->left);
+    // in-order
+    
+    apply_post(tree->right);
+	printf("%s ",tree->s);
     // post-order
     // f(tree, arg);
 }
@@ -334,8 +368,9 @@ void apply_pre(tree_node *tree, void (*f)(tree_node*, void*), void *arg)
     if (tree == NULL)
         return;
 
-    f(tree, arg);
+    
     apply_pre(tree->left, f, arg);
+	f(tree, arg);
     apply_pre(tree->right, f, arg);
 }
 
@@ -526,7 +561,8 @@ int main(void)
 		printf("3 - удалить элемент из дерева\n");
 		printf("4 - вывести количество слов на указанную букву\n");
 		printf("5 - вывести элементы дерева\n");
-		printf("6 - вывести эффективность\n\n");
+		printf("6 - Очистить дерево\n");
+		printf("7 - вывести эффективность\n\n");
 		printf("0 - выход\n");
 		int choose;
 		printf("Ваш выбор: ");
@@ -629,11 +665,42 @@ int main(void)
 			}
 			else if (choose == 5)
 			{
-				printf("Элементы дерева:\n");
-				apply(root);
-				printf("\n");
+				if (!root)
+				{
+					printf("Дерево пусто!\n");
+				}
+				else
+				{
+					printf("Элементы дерева:\n");
+					printf("pre order:\n");
+					apply_pre_ord(root);
+					printf("\n");
+					printf("in order:\n");
+					apply_in(root);
+					printf("\n");
+					printf("post order:\n");
+					apply_post(root);
+					printf("\n");
+					{
+						FILE *f = fopen("res.gv", "w");
+						assert(f);
+				
+						export_to_dot(f, "test_tree", root, literal);
+						
+						fclose(f);
+					} 
+					printf("В файле res.gv записано дерево на языке DOT\n");
+				}
 			}
 			else if (choose == 6)
+			{
+				while(root)
+				{
+					root = delete(root, root->s);
+				}
+				printf("Дерево очищено!\n")
+			}
+			else if (choose == 7)
 			{
 				test_time();
 			}
