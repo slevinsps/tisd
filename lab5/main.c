@@ -164,6 +164,18 @@ double get_element(int i,int j, double *A, int *JA, IA *ia)
     return AA;
 }
 
+void variable(int n)
+{
+	if (n > 300)
+	{
+		for (int i = 0; i < n/20; i++)
+		{
+			int *m = calloc(500,sizeof(int));
+			free(m);
+		}
+	}
+}
+
 int print_razr(FILE *f, double *A, int *JA, IA *elem_ia,int counter_not_zero, int n, int m)
 {    
     for (int i = 0; i < n; i++)
@@ -197,15 +209,15 @@ void get_column(int number, int n, double *A, int *JA, IA *elem_ia, int counter_
     }
 }
 
-void multiply_razr(double *A, int *JA, IA *ia, double *B, int *JB, IA *ib, double **res_matr)
+void multiply_razr(double *A, int *JA, IA *ia, double *B, int *JB, IA *ib, double **res_matr, int o)
 {
     int k = 0;
-	
     IA *ia_copy = ia;
     while(ib->next)
     {
         for (int i = ib->Nk; i < ib->next->Nk; i++)
         {
+			variable(o);
             while(JB[i] != ia->number_row)
                 ia = ia->next;
             for (int j = ia->Nk; j < ia->next->Nk; j++)
@@ -218,7 +230,6 @@ void multiply_razr(double *A, int *JA, IA *ia, double *B, int *JB, IA *ib, doubl
         ia = ia_copy;
         ib = ib->next;
     }    
-	
 }
 
 void free_matrix_rows(double **data, int n)
@@ -252,17 +263,17 @@ double **allocate_matrix_row(int n, int m)
 void multiply_matrix(double **matrix1, double **matrix2, int n1,
 		int m1, int n2, int m2, double **matrix3)
 {  
-    //for (int ii = 0; ii < n1; ii++)
-    //{
-        for (int i = 0; i < 1000; i++)
+    for (int ii = 0; ii < n1; ii++)
+    {
+        for (int i = 0; i < m1; i++)
         {
             //(*matrix3)[ii][i] = 0;
-            for (int j = 0; j < 1000; j++)
+            for (int j = 0; j < n2; j++)
             {
                 matrix3[0][i] += matrix1[0][j] * matrix2[j][i];
             }
         }        
-    //}  
+    }  
     //return OK;
 }
 
@@ -307,6 +318,36 @@ void print_matrix(double **matrix, int n, int m)
         printf("\n");
     }
     printf("\n");    
+}
+
+void print_matrix_razr(double **matrix, int n, int m)
+{ 
+	double *res_R = NULL;
+    int *res_RB = NULL;
+    IA *elem_ir = NULL;
+	int counter_not_zero;
+	
+	matr_to_razr(matrix, &res_R,  &res_RB, &elem_ir, &counter_not_zero, &n, &m);
+	
+    printf("Массив A:\n");
+	for (int i = 0; i < counter_not_zero; i++)
+	{
+		printf("%.1f ",res_R[i]);
+	}
+    printf("\n");   
+	printf("Массив JA:\n");
+	for (int i = 0; i < counter_not_zero; i++)
+	{
+		printf("%d  ",res_RB[i]);
+	}
+    printf("\n");
+	printf("Связный список IA:\n");
+	while(elem_ir)
+	{
+		printf("%d ",elem_ir->Nk);
+		elem_ir = elem_ir->next;
+	}
+    printf("\n");
 }
 
 
@@ -376,13 +417,13 @@ void print_time_size(void)
         fclose(f1);
         fclose(f2);
         
-        f1 = fopen("v.txt","r");
+		f1 = fopen("v.txt","r");
         f2 = fopen("m.txt","r");
 		fscanf(f1,"%d",&m2);
 		n2 = 1;
-        fscanf(f2,"%d %d",&n1, &m1);
-
-        
+        fscanf(f2,"%d %d",&n1, &m1); 
+		
+		
         input_razr(f2, &A, &JA, &elem_ia, &counter_not_zero1, &n1, &m1);
         input_razr(f1, &B, &JB, &elem_ib, &counter_not_zero2, &n2, &m2);
         razr_in_full(A, JA, elem_ia, B, JB, elem_ib, n1, m1, n2, &mat1, &mat2); 
@@ -392,36 +433,33 @@ void print_time_size(void)
         for (int k = 0; k < w; k++)
         {
             tb = tick();
-            multiply_razr(A, JA, elem_ia, B, JB, elem_ib, res);
+            multiply_razr(A, JA, elem_ia, B, JB, elem_ib, res,nn);
             te = tick();
-            if (te > tb )
+            if (te > tb)
                 t_mid1 += ( te - tb );
-				//t_mid1 += tick() - tb;
             else
                 w--;
         }
         t_mid1 = t_mid1/w;
-        printf("%3d%%                %7I64d        ",pr,t_mid1);
-        
-        
-           
+        printf("%3d%%                %9I64d        ",pr,t_mid1);
         t_mid2 = 0;
         w = 10;
-        mat_res = allocate_matrix_row(n2, n1);
+		
+        mat_res = allocate_matrix_row(n2, m1);
+		
         for (int k = 0; k < w; k++)
         {
             tb = tick();
-            multiply_matrix(mat2, mat1, n2, n1, n1, m1, mat_res);
+            multiply_matrix(mat2, mat1, n2, m2, n1, m1, mat_res);          
             te = tick();
             if (te > tb )
 				t_mid2 += ( te - tb );
-                //t_mid2 += tick() - te ;
             else
                w--;
         }
         t_mid2 = t_mid2/w;
         printf("%7I64d  ",t_mid2);
-        printf("  %8.3f  ",(float)t_mid2/t_mid1);
+        printf("  %9.3f  ",(float)t_mid2/t_mid1);
         
         pam_razr = (sizeof(int)+sizeof(double))*(counter_not_zero1+counter_not_zero2);
         pam_razr += (sizeof(IA)*(n1+1));
@@ -476,7 +514,8 @@ int main(void)
     FILE *f1;
     FILE *f2;
     
-    
+  
+	
     setbuf(stdout,NULL);
     int err = OK;
     printf("%I64d\n",sizeof(IA));
@@ -593,7 +632,7 @@ int main(void)
                     
                     double **res = allocate_matrix_row(n2, m1);
                     tb = tick();
-                    multiply_razr(A, JA, elem_ia, B, JB, elem_ib, res);
+                    multiply_razr(A, JA, elem_ia, B, JB, elem_ib, res,1);
                     te = tick();
                     printf("Время выполнения умножения разреженных матриц = %I64d\n",te - tb);
                     
@@ -612,7 +651,7 @@ int main(void)
                     
                     
                     printf("Результат умножения разреженных матриц:\n");
-                    //print_matrix(res, n2, m1);
+					print_matrix_razr(res, n2, m1);
 					
                     printf("Результат умножения обычных матриц:\n");
                     print_matrix(mat_res, n2, m1);
@@ -690,7 +729,7 @@ int main(void)
                     
                     double **res = allocate_matrix_row(n2, m1);
                     tb = tick();
-                    multiply_razr(A, JA, elem_ia, B, JB, elem_ib, res);
+                    multiply_razr(A, JA, elem_ia, B, JB, elem_ib, res, 1);
                     te = tick();
                     printf("Время выполнения умножения разреженных матриц = %I64d\n",te - tb);
                     
@@ -709,8 +748,9 @@ int main(void)
                     
                     
                     printf("Результат умножения разреженных матриц:\n");
-                    print_matrix(res, n2, m1);
-                    printf("Результат умножения обычных матриц:\n");
+                    //print_matrix(res, n2, m1);
+                    print_matrix_razr(res, n2, m1);
+					printf("Результат умножения обычных матриц:\n");
                     print_matrix(mat_res, n2, m1);
                     free(A);
                     free(JA);
@@ -794,7 +834,7 @@ int main(void)
                 }
                 double **res = allocate_matrix_row(n2, m1);
                 tb = tick();
-                multiply_razr(A, JA, elem_ia, B, JB, elem_ib, res);
+                multiply_razr(A, JA, elem_ia, B, JB, elem_ib, res, 1);
                 te = tick();
                 printf("Время выполнения умножения разреженных матриц = %I64d\n",te - tb);
                 
@@ -810,8 +850,9 @@ int main(void)
                 printf("Время выполнения стандартного умножения %I64d\n",te - tb);
                 
                 printf("Результат умножения разреженных матриц:\n");
-                print_matrix(res, n2, m1);
-                printf("Результат умножения обычных матриц:\n");
+                //print_matrix(res, n2, m1);
+                print_matrix_razr(res, n2, m1);
+				printf("Результат умножения обычных матриц:\n");
                 print_matrix(mat_res, n2, m1);
                 free(A);
                 free(JA);
