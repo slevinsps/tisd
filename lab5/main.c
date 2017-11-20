@@ -314,7 +314,7 @@ void print_time_size(void)
     FILE *f1;
     FILE *f2;
     int w;
-    int nn = 100;
+    int nn = 900;
     int k;
     double **mat1;
     double **mat2;
@@ -333,12 +333,13 @@ void print_time_size(void)
     int n2,m2;
     int pr = 0;
     int pam_razr = 0;
+	double **res = allocate_matrix_row(nn, nn);
     printf("Матрица %dx%d\n",nn,nn);
     printf("  Процент         разреженная     классическая  отношение    разреженная     классическая    отношение \n");
     printf("заполнения          (время)          (время)                   (память)       (память)\n");
-    for (int e = size_matrix/100; e <= size_matrix; e+=(size_matrix/100))
+    for (int e = size_matrix/10; e <= size_matrix; e+=(size_matrix/10))
     {
-        pr++;
+        pr+=10;
         f1 = fopen("v.txt","w");
         f2 = fopen("m.txt","w");
         
@@ -381,8 +382,8 @@ void print_time_size(void)
         input_razr(f2, &A, &JA, &elem_ia, &counter_not_zero1, &n1, &m1);
         input_razr(f1, &B, &JB, &elem_ib, &counter_not_zero2, &n2, &m2);
         
-        double **res = allocate_matrix_row(n2, n1);
-        w = 1;
+        
+        w = 100;
         t_mid1 = 0;
         for (int k = 0; k < w; k++)
         {
@@ -400,7 +401,7 @@ void print_time_size(void)
         
         razr_in_full(A, JA, elem_ia, B, JB, elem_ib, n1, m1, n2, &mat1, &mat2);    
         t_mid2 = 0;
-        w = 1;
+        w = 100;
         mat_res = allocate_matrix_row(n2, n1);
         for (int k = 0; k < w; k++)
         {
@@ -410,7 +411,7 @@ void print_time_size(void)
             if (te > tb )
                 t_mid2 += ( te - tb );
             else
-                w--;
+               w--;
         }
         t_mid2 = t_mid2/w;
         printf("%7I64d  ",t_mid2);
@@ -441,8 +442,8 @@ void print_time_size(void)
         free(B);
         free(JB);
         
-        free_matrix_rows(res, n2);
-        free_matrix_rows(mat_res, n2);
+        //free_matrix_rows(res, n2);
+        //free_matrix_rows(mat_res, n2);
         fclose(f1);
         fclose(f2);    
     }
@@ -605,7 +606,8 @@ int main(void)
                     
                     
                     printf("Результат умножения разреженных матриц:\n");
-                    print_matrix(res, n2, m1);
+                    //print_matrix(res, n2, m1);
+					
                     printf("Результат умножения обычных матриц:\n");
                     print_matrix(mat_res, n2, m1);
                     free(A);
