@@ -698,7 +698,7 @@ int main(void)
 				{
 					root = delete(root, root->s);
 				}
-				printf("Дерево очищено!\n")
+				printf("Дерево очищено!\n");
 			}
 			else if (choose == 7)
 			{
