@@ -1,0 +1,9 @@
+digraph test_tree {
+node [shape="circle", style="filled", fillcolor="white", fontcolor="black", margin="0.01"];
+1542 -> 1268;
+1542 -> 2514;
+2514 -> 1544;
+2514 -> 2536;
+2536 -> 9842;
+9842 -> 3542;
+}

@@ -1,0 +1,9 @@
+digraph test_tree_avl {
+node [shape="circle", style="filled", fillcolor="white", fontcolor="black", margin="0.01"];
+1542 -> 1268;
+1542 -> 1544;
+2514 -> 1542;
+2514 -> 3542;
+3542 -> 2536;
+3542 -> 9842;
+}
