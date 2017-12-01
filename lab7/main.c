@@ -270,6 +270,22 @@ void apply_pre_ord(tree_node *tree)
     // f(tree, arg);
 }
 
+void apply_pre_ord_avl(avl_tree *tree)
+{
+    if (tree == NULL)
+        return;
+
+    // pre-order
+    // f(tree, arg);
+    printf("%s ",tree->s);
+    apply_pre_ord_avl(tree->left);
+    // in-order
+    
+    apply_pre_ord_avl(tree->right);
+    // post-order
+    // f(tree, arg);
+}
+
 void apply_post(tree_node *tree)
 {
     if (tree == NULL)
@@ -282,6 +298,23 @@ void apply_post(tree_node *tree)
     // in-order
     
     apply_post(tree->right);
+    printf("%s ",tree->s);
+    // post-order
+    // f(tree, arg);
+}
+
+void apply_post_avl(avl_tree *tree)
+{
+    if (tree == NULL)
+        return;
+
+    // pre-order
+    // f(tree, arg);
+    
+    apply_post_avl(tree->left);
+    // in-order
+    
+    apply_post_avl(tree->right);
     printf("%s ",tree->s);
     // post-order
     // f(tree, arg);
@@ -680,24 +713,43 @@ int hash_key(char *s)
 {
 	unsigned int key = 0;
 	int len = strlen(s);
+	int size;
 	for (int i = 0; i < len; i++)
 	{
-		key += ((unsigned char)s[i] - 47) * (i+1);
+		size = (unsigned char)s[i];
+		/* if ((unsigned char)s[i] % 2 == 0)
+			key += (((unsigned char)s[i]  - 47)) ^ (i + 1);
+		else
+			key += ((((unsigned char)s[i] - 47)) ^ (i + 1)); */
+		//key += ((((unsigned char)s[i] ) << 2) + (i + 1)) >> 1;
+		//key += (size ^ (i + 1) + (size % 10) * (size - len)  ); 
+		/* if (size < 100)
+			key += (size ^ (i + 1) + (size % 10) * (size - len)  ); // крутая штука 
+		else */
+			//key += (size / 10) * (size % 10) + (i + 1) ; // для русских букв
+			key += (size - 47) * (i + 1) ; 
 	}
 	return key;
 }
 
-int add_in_hash_array(hash_struct ***hash_array, char *s, int *size_hash_array)
+int add_in_hash_array(hash_struct ***hash_array, char *s, int *size_hash_array, int *memory)
 {
 	int key = hash_key(s);
 	hash_struct **tmp = NULL;
 	hash_struct *tmp2 = NULL;
 	if (key >= *size_hash_array)
 	{
-		*size_hash_array = key+1;
-		tmp = realloc(*hash_array, (*size_hash_array)*sizeof(hash_struct));
+		
+		tmp = realloc(*hash_array, (key+1)*sizeof(hash_struct));
 		if (tmp)
+		{
+			for(int i = *size_hash_array; i < key+1; i++)
+			{
+				tmp[i] = NULL;
+			}
 			*hash_array = tmp;
+			*size_hash_array = key+1;
+		}
 		else 
 		{
 			return 0;
@@ -706,6 +758,7 @@ int add_in_hash_array(hash_struct ***hash_array, char *s, int *size_hash_array)
 	if (!(*hash_array)[key])
 	{
 		(*hash_array)[key] = malloc(sizeof(hash_struct));
+		*memory += sizeof(hash_struct);
 		(*hash_array)[key]->s = s;
 		(*hash_array)[key]->next = NULL;
 	}
@@ -723,6 +776,7 @@ int add_in_hash_array(hash_struct ***hash_array, char *s, int *size_hash_array)
 		if (strcmp(tmp2->s, s) == 0)
 			return 1;
 		tmp2->next = malloc(sizeof(hash_struct));
+		*memory += sizeof(hash_struct);
 		tmp2->next->s = s;
 		tmp2->next->next = NULL;	
 	}
@@ -765,13 +819,16 @@ int del_in_hash_array(hash_struct **hash_array, char *s, int *size_hash_array)
 	}
 	return 0;
 }
+
 void printf_hash_table(hash_struct **hash_array, int size_hash_array, int *max_coll)
 {
 	int count = -1;
+	int k = 1;
 	for (int i = 0; i < size_hash_array ; i++)
-             {
+    {
 		if (hash_array[i])
 		{
+			k = 0;
 			hash_struct *tmp = hash_array[i];
 			count = -1;
 			while(tmp)
@@ -784,20 +841,19 @@ void printf_hash_table(hash_struct **hash_array, int size_hash_array, int *max_c
 			if (*max_coll < count)
 				*max_coll = count;
 		}
-	}	
+	}
+	if (k)
+		printf("Таблица пуста!\n");
 }
 
 char * find_in_hash(hash_struct **hash_array, char *s)
 {
 	unsigned int res = hash_key(s);
-	if (hash_array[res])
+	while (hash_array[res])
 	{
-		while (hash_array[res])
-		{
-			if (strcmp(hash_array[res]->s, s) == 0)
-				return (hash_array[res]->s);
-			hash_array[res] = hash_array[res]->next;
-		}
+		if (strcmp(hash_array[res]->s, s) == 0)
+			return (hash_array[res]->s);
+		hash_array[res] = hash_array[res]->next;
 	}
 	return NULL;
 }
@@ -810,27 +866,23 @@ int main(void)
     avl_tree *node_avl = NULL;
 	avl_tree *tmp_avl = NULL;
     tree_node *tmpp = NULL;
-   
+	int memory = 0;
     tree_node *node;
 	
-	int size_hash_array = 3000;
+	int size_hash_array = 20;
     hash_struct **hash_array = calloc(size_hash_array,sizeof(hash_struct));
 	
 	
 	
-    unsigned long long tb, te, t_plus;
+    unsigned long long tb, te, t_mid;
     
     char *string = malloc(SIZE_BUF);
     
     int n = 0;
     char **words = NULL;
     int ind = 0;
-    char literal;
-    int count_words1;
-    int count_words2;
     
     setbuf(stdout,NULL); 
-    int r = 1;
     while(1)
     {
         printf("\nПрограмма ищет количество слов в файле, начинающихся на определенную букву\n");
@@ -841,7 +893,8 @@ int main(void)
         printf("4 - вывести элементы обычного дерева и avl дерева\n");
         printf("5 - вывести hash таблицу\n");
         printf("6 - очистить данные из всех структур(хэш-таблица обычное и avl дерево)\n");
-        printf("7 - вывести эффективность\n\n");
+        printf("7 - поиск по слову\n");
+        printf("8 - вывести эффективность\n\n");
         printf("0 - выход\n");
         int choose;
         printf("Ваш выбор: ");
@@ -849,14 +902,9 @@ int main(void)
         {
             if (choose == 1)
             {
+				char c = 'А';
+				printf("## %d %d ", (unsigned char)c);
                 FILE *f = fopen("in.txt","r");
-                tb = tick();
-                while(fgets(string,SIZE_BUF - 2,f))
-                {
-                }
-                te = tick();
-                t_plus = te -  tb;
-                rewind(f);
                 while(fgets(string,SIZE_BUF - 2,f))
                 {
                     ind = n;
@@ -865,62 +913,42 @@ int main(void)
                     split_words(string, words, ind);
                     string = malloc(SIZE_BUF);
                 }
-                int key;
                 for (int i = 0; i < n ; i++)
                 {
                     node = create_node(words[i]);
                     root = insert(root, node);
 					
-					add_in_hash_array(&hash_array, words[i], &size_hash_array);
+					add_in_hash_array(&hash_array, words[i], &size_hash_array, &memory);
 					
 					node_avl = create_avl_node(words[i]);
 					root_avl = insert_avl(root_avl, node_avl);
-					
-					
                 }
-				int max_coll = -1;
-				//int k = printf_hash_table(hash_array, size_hash_array, &max_coll); 
-				//printf("%d %d\n", k, n);
-				//printf("%d\n", max_coll);
-				char *ss;
-				tb = tick();
-				ss = find_in_hash(hash_array, "costume");
-				te = tick();
-				printf("%s   %I64d\n",ss, te-tb );
-				/*tb = tick();
-				tmpp = search(root, "costume");
-				te = tick();
-				ss = tmpp->s;
-				printf("%s   %I64d\n", ss, te-tb );
-				tb = tick();
-				tmp_avl = search_avl(root_avl, "costume");
-				te = tick();
-				ss = tmpp->s;
-				printf("%s   %I64d\n", ss, te-tb ); */
-				
-				//printf("%d   %d    %d   %d", '0', 'a', (unsigned char)'А', (unsigned char)'а');
-                fclose(f);
-                printf("Дерево заполнено!\n");
+				fclose(f);
+                printf("Структуры заполнены!\n");
             }            
             else if (choose == 2)
             {
-                r = 0;
                 char *str = malloc(SIZE_BUF);
                 printf("Введите слово: ");
                 scanf("%s",str);
                 fflush(stdin);
+				
                 node = create_node(str);
                 root = insert(root, node);
                 
+				add_in_hash_array(&hash_array, str, &size_hash_array, &memory);
+					
+				node_avl = create_avl_node(str);
+				root_avl = insert_avl(root_avl, node_avl);
+				
                 printf("Элемент добавлен!\n");
             }
             else if (choose == 3)
             {
-                r = 0;
                 if (!root)
                 {
                     printf("Структуры пусты!\n");
-                    break;
+                    continue;
                 }
                 char *str_del = malloc(SIZE_BUF);
                 printf("Введите слово: ");
@@ -956,11 +984,11 @@ int main(void)
             {
                 if (!root)
                 {
-                    printf("Дерево пусто!\n");
+                    printf("Деревья пусты!\n");
                 }
                 else
                 {
-                    printf("Элементы дерева:\n");
+                    printf("Элементы обычного дерева:\n");
                     printf("pre order:\n");
                     apply_pre_ord(root);
                     printf("\n");
@@ -969,7 +997,18 @@ int main(void)
                     printf("\n");
                     printf("post order:\n");
                     apply_post(root);
+                    printf("\n\n");
+					
+					printf("Элементы avl дерева:\n");
+                    printf("pre order:\n");
+                    apply_pre_ord_avl(root_avl);
                     printf("\n");
+                    printf("in order:\n");
+                    apply_in_avl(root_avl);
+                    printf("\n");
+                    printf("post order:\n");
+                    apply_post_avl(root_avl);
+                    printf("\n");					
                     {
 						FILE *f = fopen("res.gv", "w");
 						FILE *f2 = fopen("res_avl.gv", "w");
@@ -981,14 +1020,17 @@ int main(void)
 						fclose(f);
 						fclose(f2);
 					} 
-                    printf("В файле res.gv записано дерево на языке DOT\n");
+                    printf("\nВ файле res.gv записано дерево на языке DOT\n");
+                    printf("В файле res_avl.gv записано avl дерево на языке DOT\n");
                 }
             }
 			else if (choose == 5)
             {
+				
 				int max_coll = -1;
 				printf_hash_table(hash_array, size_hash_array, &max_coll); 
-				
+				memory += size_hash_array*sizeof(hash_array);
+				printf("words = %d  collisions = %d array_size = %d memory = %d\n",n, max_coll, size_hash_array, memory);
 			}
             else if (choose == 6)
             {
@@ -996,9 +1038,70 @@ int main(void)
                 {
                     root = delete(root, root->s);
                 }
-                printf("Дерево очищено!\n");
+				while(root_avl)
+                {
+                    root_avl = remove_avl(root_avl, root_avl->s);
+                }
+				size_hash_array = 3000;
+				free(hash_array);
+				hash_array = calloc(size_hash_array,sizeof(hash_struct));
+				
+                printf("Структуры очищены!\n");
             }
-            else if (choose == 7)
+			else if (choose == 7)
+            {
+                char *str1 = malloc(SIZE_BUF);
+                printf("Введите слово: ");
+                scanf("%s",str1);
+                fflush(stdin);
+				
+				char *ss;
+				int kol = 100;
+				t_mid = 0;
+				for(int i = 0; i < kol; i++)
+				{
+					tb = tick();
+					ss = find_in_hash(hash_array, str1);
+					te = tick();
+					t_mid += (te - tb);
+				}
+				if (ss)
+					printf("[Хэш таблица] слово: %s время: %I64d\n",ss, t_mid/kol );
+				else
+					printf("Такого слова нет в таблице\n");
+				t_mid = 0;
+				for(int i = 0; i < kol; i++)
+				{
+					tb = tick();
+					tmpp = search(root, str1);
+					te = tick();
+					t_mid += (te - tb);
+				}
+				if (tmpp)
+				{
+					ss = tmpp->s;
+					printf("[Обычное дерево] слово: %s время: %I64d\n", ss, t_mid/kol );
+				}
+				else
+					printf("Такого слова нет в обычном дереве\n");
+				t_mid = 0;
+				for(int i = 0; i < kol; i++)
+				{
+					tb = tick();
+					tmp_avl = search_avl(root_avl, str1);
+					te = tick();
+					t_mid += (te - tb);
+				}
+				if (tmp_avl)
+				{
+					ss = tmp_avl->s;
+					printf("[Avl дерево] слово: %s время: %I64d\n", ss, t_mid/kol );
+				}
+				else
+					printf("Такого слова нет в avl дереве\n");
+				
+            }
+            else if (choose == 8)
             {
                 test_time();
             }
