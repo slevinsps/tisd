@@ -687,7 +687,8 @@ int hash_key(char *s)
     for (int i = 0; i < len; i++)
     {
         size = (unsigned char)s[i];		
-        /* if ((unsigned char)s[i] % 2 == 0)
+        /* if ((unsigned char)s[i] % 2 == 0)9
+		
             key += (((unsigned char)s[i]  - 47)) ^ (i + 1);
         else
             key += ((((unsigned char)s[i] - 47)) ^ (i + 1)); */
@@ -695,23 +696,20 @@ int hash_key(char *s)
         //key += (size ^ (i + 1) + (size % 10) * (size - len)  ); 
         if (size < 100)
             //key += (size ^ (i + 1) + (size % 10) * (size - len)  ); // крутая штука 
-            key += ((size - 47) * (i + 1));
+            key += ((size) * (i + 1));
         else
-            key += (size / 10) * (size % 10) + (i + 1) ; // для русских букв
-             
+            key += (size / 10) * (size % 10) + (i + 1) ; // для русских букв        
     }
-
     return key;
 }
 
-int add_in_hash_array(hash_struct ***hash_array, char *s, int *size_hash_array, int *memory)
+int add_in_hash_array(hash_struct ***hash_array, char *s, int *size_hash_array, int *memory, int *all_comp, int *all_comp3)
 {
     int key = hash_key(s);
     hash_struct **tmp = NULL;
     hash_struct *tmp2 = NULL;
     if (key >= *size_hash_array)
     {
-        
         tmp = realloc(*hash_array, (key+1)*sizeof(hash_struct));
         if (tmp)
         {
@@ -733,9 +731,12 @@ int add_in_hash_array(hash_struct ***hash_array, char *s, int *size_hash_array, 
         *memory += sizeof(hash_struct);
         (*hash_array)[key]->s = s;
         (*hash_array)[key]->next = NULL;
+		(*all_comp)++;
+		(*all_comp3)++;
     }
     else
     {
+		int o = 0;
         tmp2 = (*hash_array)[key];
         if (strcmp(tmp2->s, s) == 0)
             return 1;
@@ -744,12 +745,18 @@ int add_in_hash_array(hash_struct ***hash_array, char *s, int *size_hash_array, 
             if (strcmp(tmp2->s, s) == 0)
                 return 1;
             tmp2 = tmp2->next;
+			o++;
+			
         }
+		o++;
         if (strcmp(tmp2->s, s) == 0)
             return 1;
+		(*all_comp)+=o;
         tmp2->next = malloc(sizeof(hash_struct));
         *memory += sizeof(hash_struct);
         tmp2->next->s = s;
+		(*all_comp3)++;
+		(*all_comp)++;
         tmp2->next->next = NULL;    
     }
     return 1;
@@ -757,7 +764,7 @@ int add_in_hash_array(hash_struct ***hash_array, char *s, int *size_hash_array, 
 
 
 
-/* int add_in_hash_array(char **hash_array, char *s, int *size_hash_array, int *memory)
+int add_in_hash_array_open(char ***hash_array, char *s, int *size_hash_array, int *memory, int *all_comp)
 {
     int key = hash_key(s);
     char **tmp = NULL;
@@ -774,6 +781,8 @@ int add_in_hash_array(hash_struct ***hash_array, char *s, int *size_hash_array, 
             }
             *hash_array = tmp;
             *size_hash_array = key+1;
+			(*hash_array)[key] = s; 
+			return 1;
         }
         else 
         {
@@ -782,32 +791,51 @@ int add_in_hash_array(hash_struct ***hash_array, char *s, int *size_hash_array, 
     }
     if (!(*hash_array)[key])
     {
-        (*hash_array)[key] = malloc(sizeof(hash_struct));
-        *memory += sizeof(hash_struct);
-        (*hash_array)[key]->s = s;
-        (*hash_array)[key]->next = NULL;
+        (*hash_array)[key] = s;
+		(*all_comp)++;
     }
     else
     {
+		int o = 0;
         tmp2 = (*hash_array)[key];
         if (strcmp(tmp2, s) == 0)
             return 1;
 		int k = 1;
-        while ((key + k) < *size_hash_array && tmp2->next)
+        while ((key + k*k) < *size_hash_array)
         {
-            if (strcmp(tmp2->s, s) == 0)
-                return 1;
-            tmp2 = tmp2->next;
+			o++;
+			if (!(*hash_array)[key + k*k])
+			{
+				(*hash_array)[key + k*k] = s;
+				(*all_comp)+=o;
+				return 1;
+			}
+			tmp2 = (*hash_array)[key + k*k];
+			if (strcmp(tmp2, s) == 0)
+				return 1;
+			k++;
+			
         }
-        if (strcmp(tmp2->s, s) == 0)
-            return 1;
-        tmp2->next = malloc(sizeof(hash_struct));
-        *memory += sizeof(hash_struct);
-        tmp2->next->s = s;
-        tmp2->next->next = NULL;    
+		(*all_comp)+=o;
+		tmp = realloc(*hash_array, (key + k*k+1)*sizeof(char *));
+        if (tmp)
+        {
+            for(int i = *size_hash_array; i < key + k*k+1; i++)
+            {
+                tmp[i] = NULL;
+            }
+            *hash_array = tmp;
+            *size_hash_array = key + k*k+1;
+			(*all_comp)++;
+        }
+        else 
+        {
+            return 0;
+        }
+        (*hash_array)[key + k*k] = s;  
     }
     return 1;
-} */
+}
 
 
 
@@ -872,9 +900,26 @@ void printf_hash_table(hash_struct **hash_array, int size_hash_array, int *max_c
             if (*max_coll < count)
                 *max_coll = count;
         }
+		else
+			printf("......ячейка пуста.........\n");
     }
     if (k)
         printf("Таблица пуста!\n");
+}
+
+void printf_hash_table_open(char **hash_array, int size_hash_array, int *max_coll)
+{
+    int count = -1;
+    int k = 1;
+    for (int i = 0; i < size_hash_array ; i++)
+    {
+        if (hash_array[i])
+        {
+            printf("%s\n", hash_array[i]);
+        }
+		else
+			printf("......ячейка пуста.........\n");
+    }
 }
 
 void max_compare(hash_struct **hash_array, int size_hash_array, int *max_coll)
@@ -911,13 +956,33 @@ char *find_in_hash(hash_struct **hash_array, char *s, int size_hash_array)
     return NULL;
 }
 
+char *find_in_hash_open(char **hash_array, char *s, int size_hash_array)
+{
+    unsigned int res = hash_key(s);
+    if (res > size_hash_array || res < 0)
+	{
+        return NULL;
+	}
+	int k = 0;
+    while (res + k*k < size_hash_array)
+    {
+		if (hash_array[res + k*k])
+		{
+			if (strcmp(hash_array[res + k*k], s) == 0)
+				return (hash_array[res + k*k]);
+		}
+		k++;
+
+    }
+    return NULL;
+}
 
 
 
 void test_time(void)
 {
     printf("Эффективность поиска:\n");
-    printf("|кол-во эл-ов| дерево| avl дерево| hash таблица| массив|\n");
+    printf("|кол-во эл-ов| дерево| avl дерево| hash таблица| массив| открытая адресация|\n");
     srand(time(NULL));
     tree_node *root = NULL;
     tree_node *node;
@@ -929,7 +994,11 @@ void test_time(void)
     hash_struct **hash_array = calloc(size_hash_array,sizeof(hash_struct));
     int memory = 0;
     
-    unsigned long long tb, te, t_mid = 0, t_mid_avl = 0, t_mid_hash = 0, t_mid_arr = 0;
+	int size_hash_array1 = 20;
+    char **hash_array_open = calloc(size_hash_array1,sizeof(char*));
+    int memory1 = 0;
+	
+    unsigned long long tb, te, t_mid = 0, t_mid_avl = 0, t_mid_hash = 0, t_mid_arr = 0, t_mid_open = 0;
     char **words = NULL;
     int n = 4096;
     int num;
@@ -939,7 +1008,9 @@ void test_time(void)
     tree_node *sear;
     avl_tree *sear_avl;
     char *sear1;
-    
+    int all_comp = 0;
+    int all_comp2 = 0;
+    int all_comp3 = 0;
     for (int i = 2; i <= n; i *= 2)
     {
         t_mid = 0;
@@ -954,21 +1025,23 @@ void test_time(void)
             root = insert(root, node);
     
                     
-            add_in_hash_array(&hash_array, string, &size_hash_array, &memory);
-                    
+            add_in_hash_array(&hash_array, string, &size_hash_array, &memory, &all_comp, &all_comp2);
+			add_in_hash_array_open(&hash_array_open, string, &size_hash_array1, &memory1, &all_comp3);            
+			
             node_avl = create_avl_node(string);
             root_avl = insert_avl(root_avl, node_avl);
     
     
             string = malloc(6);
         }
-        char *search_str = "99";
+        char *search_str = "hey";
         //char *search_str = "mamamammamamamam";
         int m = 100;
         t_mid = 0;
         t_mid_hash = 0;
         t_mid_arr = 0;
         t_mid_avl = 0;
+		t_mid_open = 0;
         for (int w = 0; w < m; w++ )
         {
             tb = tick();
@@ -987,6 +1060,11 @@ void test_time(void)
             te = tick();
             t_mid_hash += (te - tb);
             
+			tb = tick();
+			ss = find_in_hash_open(hash_array_open, search_str,  size_hash_array1);
+			te = tick();
+			t_mid_open += (te - tb);
+			
             tb = tick();
             for(int j = 0; j < i; j++)
             {
@@ -1002,8 +1080,8 @@ void test_time(void)
         t_mid_hash = t_mid_hash / m;
         t_mid_arr = t_mid_arr / m;
         t_mid_avl = t_mid_avl / m;
-        
-        printf("%8d       %4I64d      %4I64d       %5I64d       %6I64d\n", i, t_mid, t_mid_avl, t_mid_hash, t_mid_arr);
+        t_mid_open = t_mid_open/m;
+        printf("%8d       %4I64d      %4I64d       %5I64d       %6I64d      %6I64d\n", i, t_mid, t_mid_avl, t_mid_hash, t_mid_arr, t_mid_open);
         while(root)
         {
             root = delete(root, root->s);
@@ -1016,10 +1094,13 @@ void test_time(void)
         root_avl = NULL;
         free(hash_array);
         size_hash_array = 20;
-        hash_array = calloc(size_hash_array,sizeof(hash_struct));    
+        hash_array = calloc(size_hash_array,sizeof(hash_struct));  
+		free(hash_array_open);
+        size_hash_array1 = 20;
+        hash_array_open = calloc(size_hash_array1,sizeof(char*));  		
     }
     printf("Эффективность по пямяти(байты):\n");
-    printf("|кол-во эл-ов|   дерево  |  avl дерево| hash таблица|\n");
+    printf("|кол-во эл-ов|   дерево  |  avl дерево| hash таблица|  открытая адресация|\n");
     memory = 0;
     for (int i = 2; i <= n; i *= 2)
     {
@@ -1035,18 +1116,19 @@ void test_time(void)
             root = insert(root, node);
     
                     
-            add_in_hash_array(&hash_array, string, &size_hash_array, &memory);
-                    
-            node_avl = create_avl_node(string);
+            add_in_hash_array(&hash_array, string, &size_hash_array, &memory, &all_comp, &all_comp2);
+            add_in_hash_array_open(&hash_array_open, string, &size_hash_array1, &memory1, &all_comp3);
+            
+			node_avl = create_avl_node(string);
             root_avl = insert_avl(root_avl, node_avl);
-    
+			
     
             string = malloc(6);
         }
         int max_coll = -1;
         max_compare(hash_array, size_hash_array, &max_coll);
         
-        printf("%8d       %7I64d      %7I64d       %5d\n", i, i*sizeof(tree_node), i*sizeof(avl_tree), memory);
+        printf("%8d       %7I64d      %7I64d       %5d     %5d    = %7I64d    = %7I64d \n ", i, i*sizeof(tree_node), i*sizeof(avl_tree), memory, size_hash_array1*sizeof(char*),size_hash_array, size_hash_array1 );
 		while(root)
         {
             root = delete(root, root->s);
@@ -1060,6 +1142,9 @@ void test_time(void)
         free(hash_array);
         size_hash_array = 20;
         hash_array = calloc(size_hash_array,sizeof(hash_struct)); 
+		free(hash_array_open);
+        size_hash_array1 = 20;
+        hash_array_open = calloc(size_hash_array1,sizeof(char*));  	
 	}    
 }
 
@@ -1076,8 +1161,9 @@ int main(void)
     
     int size_hash_array = 20;
     hash_struct **hash_array = calloc(size_hash_array,sizeof(hash_struct));
-    
-    
+	int size_hash_array1 = 20;
+    char **hash_array_open = calloc(size_hash_array1,sizeof(char*));
+    int memory1;
     
     unsigned long long tb, te, t_mid;
     
@@ -1099,10 +1185,14 @@ int main(void)
         printf("5 - вывести hash таблицу\n");
         printf("6 - очистить данные из всех структур(хэш-таблица обычное и avl дерево)\n");
         printf("7 - поиск по слову\n");
-        printf("8 - вывести эффективность\n\n");
+        printf("8 - вывести эффективность\n");
+        printf("9 - вывести хэш таблицу с открытой адресацией\n\n");
         printf("0 - выход\n");
         int choose;
         printf("Ваш выбор: ");
+		int all_comp = 0;
+		int all_comp2 = 0;
+		int all_comp3 = 0;
         if (scanf("%d",&choose) == 1)
         {
             if (choose == 1)
@@ -1122,8 +1212,9 @@ int main(void)
                     node = create_node(words[i]);
                     root = insert(root, node);
                     
-                    add_in_hash_array(&hash_array, words[i], &size_hash_array, &memory);
-                    
+                    add_in_hash_array(&hash_array, words[i], &size_hash_array, &memory, &all_comp, &all_comp2);
+                    add_in_hash_array_open(&hash_array_open, words[i], &size_hash_array1, &memory1, &all_comp3);
+					
                     node_avl = create_avl_node(words[i]);
                     root_avl = insert_avl(root_avl, node_avl);
                 }
@@ -1136,7 +1227,8 @@ int main(void)
                 int max_coll = 0;
                 max_compare(hash_array, size_hash_array, &max_coll);
                 printf("hash таблица = %d\n", max_coll+1);
-                
+                printf("Среднее количество сравнений в цепочках = %f\n",(float)all_comp/all_comp2);
+                printf("Среднее количество сравнений в открытой адресации = %f\n",(float)all_comp3/all_comp2);
 
             }            
             else if (choose == 2)
@@ -1149,7 +1241,7 @@ int main(void)
                 node = create_node(str);
                 root = insert(root, node);
                 
-                add_in_hash_array(&hash_array, str, &size_hash_array, &memory);
+                add_in_hash_array(&hash_array, str, &size_hash_array, &memory, &all_comp, &all_comp2);
                     
                 node_avl = create_avl_node(str);
                 root_avl = insert_avl(root_avl, node_avl);
@@ -1239,8 +1331,9 @@ int main(void)
             }
             else if (choose == 5)
             {
+				int max_coll = -1;
                 
-                int max_coll = -1;
+                
                 printf_hash_table(hash_array, size_hash_array, &max_coll); 
                 memory += size_hash_array*sizeof(hash_array);
                 printf("words = %d  collisions = %d array_size = %d memory = %d\n",n, max_coll, size_hash_array, memory);
@@ -1274,7 +1367,9 @@ int main(void)
                 for(int i = 0; i < kol; i++)
                 {
                     tb = tick();
-                    ss = find_in_hash(hash_array, str1, size_hash_array);
+                    //ss = find_in_hash(hash_array, str1, size_hash_array);
+                    ss = find_in_hash_open(hash_array_open, str1, size_hash_array1);
+					
                     te = tick();
                     t_mid += (te - tb);
                 }
@@ -1302,6 +1397,7 @@ int main(void)
                 {
                     tb = tick();
                     tmp_avl = search_avl(root_avl, str1);
+					
                     te = tick();
                     t_mid += (te - tb);
                 }
@@ -1318,6 +1414,12 @@ int main(void)
             {
                 test_time();
             }
+			else if (choose == 9)
+            {
+				int max_coll = -1;
+                printf_hash_table_open(hash_array_open, size_hash_array1,  &max_coll);
+            }
+			
             else if (choose == 0)
                 break;
             else
