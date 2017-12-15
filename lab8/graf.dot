@@ -1,0 +1,8 @@
+digraph test_tree_avl {
+1 -> 2[label=2;];
+1 -> 3[label=5;];
+2 -> 1[label=2;];
+2 -> 3[label=1;];
+3 -> 1[label=1;];
+3 -> 2[label=7;];
+}
